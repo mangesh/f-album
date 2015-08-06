@@ -1,6 +1,19 @@
 composer.phar
+/lib
+/.bundle
+/doc/
+*.rbc
+*.sassc
+.sass-cache
+.rspec
+/lib/vendor/bundle
+/log/*
+/tmp/*
+/public/system/*
+/public/inc/db-config.php
+/public/inc/tw-config.php
+/spec/tmp/*
+**.orig
+/*.log
+composer.lock
 vendor/
-
-# Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
-# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
-# composer.lock
