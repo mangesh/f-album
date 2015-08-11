@@ -53,8 +53,9 @@ $app->configureMode('development', function () use ($app) {
             'db_pass' => $db['password']
         ),
         'fb' => array(
-            'app_id'     => $fb['app_id'],
-            'app_secret' => $fb['app_secret'],
+            'app_id'        => $fb['app_id'],
+            'app_secret'    => $fb['app_secret'],
+            'callback_url'  => $fb['callback_url']
         )
     ));
 });
@@ -263,7 +264,15 @@ $app->get('/clearsession', function () use ($app) {
 // // GET request on /album/:id. Should be self-explaining. 
 $app->get('/album/:id', function ($id) use ($app, $model, $fb){
     $album_id = $id;
-    $app->render('album.twig');
+    $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
+    $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
+    $photos = $fb->get('/'.$album_id.'/photos?fields=id,picture,name&limit=50')->getDecodedBody();
+    /*echo "<pre>";
+    print_r($photos); die();*/
+    $app->render('album.twig', array(
+            'profile_picture'   => $img,
+            'photos' => $photos['data']
+        ));
 });
 
 

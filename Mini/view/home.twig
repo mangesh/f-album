@@ -1,17 +1,16 @@
 {% extends "_home_base.twig" %}
 {% block content %}
-    <div class="row">
-        <div class="row">
+    <div id="grid" class="container">
+        <div id="albums">
             {% for album in albums %}
-                <div class="col-xs-6 col-md-3">
-                    <div class="img-div_">
-                        <a href="#" class="">
-                            <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
-                        </a>
-                    </div>
-                </div>
+            <div class="album">
+                <a href="/album/{{album.id}}">
+                    <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
+                    <br>
+                    <strong>{{album.name}}</strong><br>
+                </a>
+            </div>
             {% endfor %}
         </div>
     </div>
-    
 {% endblock %}

@@ -57,3 +57,6 @@ div.img-div{
     -webkit-transform:translate(-50%);
     margin-left:100px;
 }
+
+.album a { text-decoration: none; }
+.album { margin-bottom: 5px; }

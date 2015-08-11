@@ -16,15 +16,17 @@
                 <img src="{{profile_picture}}">
             </div>
             <br>
-            <!-- main content, will be injected via Twig -->
-            {% block content %} {% endblock %}
         </div><!-- /container -->
         
+        <!-- main content, will be injected via Twig -->
+        {% block content %} {% endblock %}
+
         <!-- Bootstrap core JavaScript
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
         <!-- jQuery -->
         <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/masonry/3.1.5/masonry.pkgd.min.js"></script>
         <!-- our JavaScript -->
         <script src="/js/application.js"></script>
         <script src="js/bootstrap.min.js"></script>
