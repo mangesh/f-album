@@ -4,13 +4,31 @@
         <div id="albums">
             {% for album in albums %}
             <div class="album">
-                <a href="/album/{{album.id}}">
+                <a href="#" id="{{album.id}}" class="load-album">
                     <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
                     <br>
                     <strong>{{album.name}}</strong><br>
                 </a>
             </div>
             {% endfor %}
+        </div>
+    </div>
+    <a href="#slideShow" id="openModal">Open</a>
+    <div id="slideShow" class="my-modal container">
+        <!--THIS IS IMPORTANT! to close the modal, the class name has to match the name given on the ID  class="close-animatedModal" -->
+        <div class="close-slideShow my-modal-close"> 
+            CLOSE MODAL
+        </div>
+            
+        <div class="modal-content">
+            <div class="flexslider">
+                <ul class="slides">
+                    <!-- <li>
+                        <img src="images/kitchen_adventurer_cheesecake_brownie.jpg" />
+                        <p class="flex-caption">Adventurer Cheesecake Brownie</p>
+                    </li> -->
+                </ul>
+            </div>
         </div>
     </div>
 {% endblock %}

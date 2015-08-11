@@ -262,17 +262,21 @@ $app->get('/clearsession', function () use ($app) {
 });
 
 // // GET request on /album/:id. Should be self-explaining. 
-$app->get('/album/:id', function ($id) use ($app, $model, $fb){
-    $album_id = $id;
+$app->get('/album', function () use ($app, $model, $fb){
+
+    $album_id = $_GET['id'];
+    
     $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
     $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
     $photos = $fb->get('/'.$album_id.'/photos?fields=id,picture,name&limit=50')->getDecodedBody();
     /*echo "<pre>";
     print_r($photos); die();*/
-    $app->render('album.twig', array(
+    $app->contentType('application/json;charset=utf-8');
+    echo json_encode($photos['data']);
+    /*$app->render('album.twig', array(
             'profile_picture'   => $img,
             'photos' => $photos['data']
-        ));
+        ));*/
 });
 
 

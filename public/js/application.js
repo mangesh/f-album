@@ -1,5 +1,5 @@
 $(function () {
-
+    $('#portfolio').hide();
     if ($('#javascript-ajax-button').length !== 0) {
         $('#javascript-ajax-button').on('click', function () {
             $.ajax("/songs/ajaxGetStats").done(function (result) {
@@ -9,6 +9,67 @@ $(function () {
             })
         })
     }
+
+    if ($('.load-album').length !== 0) {
+        $('.load-album').on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                method: "GET",
+                url: "/album",
+                data: { id: $(this).attr('id') },
+                dataType: "json"
+            }).done(function (result) {
+                console.log(result);
+                var img;
+                var li;
+                $.each(result, function(p,i){
+                    console.log(i);
+                    /*img = $('<img>');
+                    img.attr('src',i.picture).attr('alt','image'+p);*/
+                    li = $('<li><img src="'+i.picture+'"></li>');
+                    li.appendTo('.slides');
+                })
+                /*var o = {
+                    init: function(){
+                        this.portfolio.init();
+                    },
+                    portfolio: {
+                        data: {
+                        },
+                        init: function(){
+                            $('#portfolio').portfolio(o.portfolio.data);
+                        }
+                    }
+                }
+
+                $(function(){ o.init(); });*/
+                $('#openModal').click();
+            }).fail(function () {
+            }).always(function () {
+            })
+        })
+    }
+    /*
+    {
+        afterOpen: function(portfolio) {
+            console.log('opened');
+        }
+    }
+    */
+    $("#openModal").animatedModal({
+        modalTarget : 'slideShow',
+        color       : 'black',
+        afterOpen: function() {
+            console.log('opened');
+            $('.flexslider').flexslider({
+                animation: "slide",
+                width: 210,
+                start: function(slider){
+                  $('body').removeClass('loading');
+                }
+            });
+        }
+    });
 })
 
 // Load is used to ensure all images have been loaded, impossible with document
