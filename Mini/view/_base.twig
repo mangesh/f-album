@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <title>Facebook Photos</title>
+        <!-- css -->
+        <link href="/css/style.css" rel="stylesheet">
+        <link href="/css/cover.css" rel="stylesheet">
+        <link href='//fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+
+        <div class="site-wrapper">
+
+            <div class="site-wrapper-inner">
+
+                <div class="cover-container">
+
+                    <div class="masthead clearfix">
+                        <div class="inner">
+                            <h3 class="masthead-brand">fb Photos</h3>
+                            <nav>
+                                <ul class="nav masthead-nav">
+                                    <li class="active"><a href="#">Home</a></li>
+                                    <li><a href="#">Features</a></li>
+                                    <li><a href="#">Contact</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- main content, will be injected via Twig -->
+                    {% block content %} {% endblock %}
+
+                    <div class="mastfoot">
+                        <div class="inner">
+                            <p>Facebook Photos App, by <a href="https://twitter.com/iMangeshparte">Mangesh Parte</a>.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <!-- jQuery -->
+        <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <!-- our JavaScript -->
+        <script src="/js/application.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug 
+        <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>-->
+
+    </body>
+</html>

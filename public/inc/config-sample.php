@@ -7,6 +7,7 @@
         );
 
     $fb = array(
-            'app_id'     => '',
-            'app_secret' => '',
+            'app_id'        => '',
+            'app_secret'    => '',
+            'callback_url'  => ''
         );

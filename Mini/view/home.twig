@@ -1,0 +1,17 @@
+{% extends "_home_base.twig" %}
+{% block content %}
+    <div class="row">
+        <div class="row">
+            {% for album in albums %}
+                <div class="col-xs-6 col-md-3">
+                    <div class="img-div_">
+                        <a href="#" class="">
+                            <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+{% endblock %}
