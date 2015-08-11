@@ -1,0 +1,16 @@
+{% extends "_home_base.twig" %}
+{% block content %}
+    <div id="grid" class="container">
+        <div id="albums">
+            {% for photo in photos %}
+            <div class="album">
+                <a href="/photo/{{photo.id}}">
+                    <img class="img-circle_" alt="{{photo.name}}" src="{{photo.picture}}">
+                    <br>
+                    <!-- <strong>{{photo.name}}</strong><br> -->
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
