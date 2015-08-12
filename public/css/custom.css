@@ -69,6 +69,37 @@ div.img-div{
     font-size: 14px;
     line-height: 18px;
 }
-    li.css a {
-      border-radius: 0;
+li.css a {
+    border-radius: 0;
+}
+
+div.c-wrapper{
+    width: 100%; /* for example */
+    margin: auto;
+}
+
+.carousel-inner > .item > img, 
+.carousel-inner > .item > a > img{
+    /*width: 100%;*/ /* use this, or not */
+    margin: auto;
+}
+
+.carousel-inner > .item > img, .carousel-inner > .item > a > img {
+    /*width: 100%;
+    max-height: 400px;*/
+}
+
+.modal-open .modal {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    overflow-y: scroll;
+}
+
+.modal-content {
+    background-color: rgba(0,0,0,0.7);
+    background-color: #000; 
+}
+.modal-backdrop
+{
+    opacity:0.5 !important;
 }

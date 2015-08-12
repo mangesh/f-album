@@ -13,21 +13,37 @@
             {% endfor %}
         </div>
     </div>
-    <a href="#slideShow" id="openModal">Open</a>
-    <div id="slideShow" class="my-modal container">
-        <!--THIS IS IMPORTANT! to close the modal, the class name has to match the name given on the ID  class="close-animatedModal" -->
-        <div class="close-slideShow my-modal-close"> 
-            CLOSE MODAL
-        </div>
+    <a href="#slideShow" id="openModal_">Open</a>
+    <div class="modal fade bs-example-modal-lg modal-vcenter" id="openModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+        <div class="modal-dialog modal-lg">
             
-        <div class="modal-content">
-            <div class="flexslider">
-                <ul class="slides">
-                    <!-- <li>
-                        <img src="images/kitchen_adventurer_cheesecake_brownie.jpg" />
-                        <p class="flex-caption">Adventurer Cheesecake Brownie</p>
-                    </li> -->
-                </ul>
+            <div class="modal-content">
+                <div class="modal-body c-wrapper">
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel_">
+                        <!-- Indicators -->
+                        <ol class="carousel-indicators">
+                            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                        </ol>
+
+                        <!-- Wrapper for slides -->
+                        <div class="carousel-inner" role="listbox">
+                            
+                        </div>
+
+                        <!-- Controls -->
+                        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
