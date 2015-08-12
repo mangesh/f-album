@@ -1,14 +1,30 @@
-$(function () {
-    $('#portfolio').hide();
-    if ($('#javascript-ajax-button').length !== 0) {
-        $('#javascript-ajax-button').on('click', function () {
-            $.ajax("/songs/ajaxGetStats").done(function (result) {
-                $('#javascript-ajax-result-box').html(result)
-            }).fail(function () {
-            }).always(function () {
-            })
-        })
+// Listrap v1.0, by Gustavo Gondim (http://github.com/ggondim)
+// Licenced under MIT License
+// For updates, improvements and issues, see https://github.com/inosoftbr/listrap
+// Modified by Mangesh for the Project f-album
+jQuery.fn.extend({
+    listrap: function () {
+        var listrap = this;
+        $(this).addClass("listrap");
+        listrap.getSelection = function () {
+            var selection = new Array();
+            listrap.children("li.active").each(function (ix, el) {
+                selection.push($(el)[0]);
+            });
+            return selection;
+        }
+        var toggle = "li .listrap-toggle ";
+        var selectionChanged = function () {
+            $(this).parent().parent().toggleClass("active");
+            listrap.trigger("selection-changed", [listrap.getSelection()]);
+        }
+        $(listrap).find(toggle + "img").on("click", selectionChanged);
+        $(listrap).find(toggle + "span").on("click", selectionChanged);
+        return listrap;
     }
+});
+
+$(function () {
 
     if ($('.load-album').length !== 0) {
         $('.load-album').on('click', function (e) {
@@ -19,7 +35,6 @@ $(function () {
                 data: { id: $(this).attr('id') },
                 dataType: "json"
             }).done(function (result) {
-                console.log(result);
                 var div;
                 var img;
                 var li;
@@ -29,29 +44,12 @@ $(function () {
                     div = $('<div>');
                     div.addClass('item');
                     img = $('<img>').appendTo(div);
-                    img.attr('src',i.picture).attr('alt','image'+p).addClass('img-responsive');
+                    img.attr('src',i.picture).attr('alt','image'+(p+1)).addClass('img-responsive');
                     img.appendTo(div);
                     div.appendTo('.carousel-inner');
-                    /*li = $('<li><img src="'+i.picture+'"></li>');
-                    li.appendTo('.slides');*/
                 })
                 $('.carousel-inner div').eq(0).addClass('active');
-                /*var o = {
-                    init: function(){
-                        this.portfolio.init();
-                    },
-                    portfolio: {
-                        data: {
-                        },
-                        init: function(){
-                            $('#portfolio').portfolio(o.portfolio.data);
-                        }
-                    }
-                }
-
-                $(function(){ o.init(); });*/
-                /*$('#openModal').click();*/
-                //$('.modal-content').css('max-height',$( window ).height()*0.8);
+                
                 $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
                 $('#openModal').modal({show:true});
                 
@@ -63,71 +61,39 @@ $(function () {
 
     $('#openModal').on('shown.bs.modal', function () {
         $('.carousel').carousel();
-        //centerModals($(this));
-        // var carousel = $(this).find('.carousel').hide();
-        // var deferreds = [];
-        // var imgs = $('.carousel', this).find('img');
-        // // loop over each img
-        // console.log('open event');
-        // imgs.each(function(){
-        //     var self = $(this);
-        //     var datasrc = self.attr('data-src');
-        //     if (datasrc) {
-        //         var d = $.Deferred();
-        //         self.one('load', d.resolve)
-        //             .attr("src", datasrc)
-        //             .attr('data-src', '');
-        //         deferreds.push(d.promise());
-        //     }
-        // });
+        /*$('.inner-circles-loader').show();
+        var carousel = $(this).find('.carousel').hide();
+        var deferreds = [];
+        var imgs = $('.carousel', this).find('img');
+        // loop over each img
+        console.log('open event');
+        imgs.each(function(){
+            var self = $(this);
+            var datasrc = self.attr('data-src');
+            if (datasrc) {
+                var d = $.Deferred();
+                self.one('load', d.resolve)
+                    .attr("src", datasrc)
+                    .attr('data-src', '');
+                deferreds.push(d.promise());
+            }
+        });
 
-        // $.when.apply($, deferreds).done(function(){
-        //     /*$('#ajaxloader').hide();*/
-        //     console.log('open deferreds');
-        //     carousel.fadeIn(1000);
-        // });
+        $.when.apply($, deferreds).done(function(){
+            $('.inner-circles-loader').hide()
+            console.log('open deferreds');
+            carousel.fadeIn(1000);
+        });*/
     });
 
-    /* center modal */
-    function centerModals($element) {
-        var $modals;
-        if ($element.length) {
-            $modals = $element;
-        } else {
-            $modals = $('.modal-vcenter:visible');
-        }
-        $modals.each( function(i) {
-            var $clone = $(this).clone().css('display', 'block').appendTo('body');
-            var top = Math.round(($clone.height() - $clone.find('.modal-content').height()) / 2);
-            top = top > 0 ? top : 0;
-            $clone.remove();
-            $(this).find('.modal-content').css("margin-top", top);
-        });
-    }
+    $(window).on('resize', function(){
+        $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+    });
 
-    //$(window).on('resize', centerModals);
-    /*
-    {
-        afterOpen: function(portfolio) {
-            console.log('opened');
-        }
-    }
-    */
-    /*$("#openModal").animatedModal({
-        modalTarget : 'slideShow',
-        color       : 'black',
-        afterOpen: function() {
-            console.log('opened');
-            $('.carousel').carousel();
-            $('.flexslider').flexslider({
-                animation: "slide",
-                width: 210,
-                start: function(slider){
-                  $('body').removeClass('loading');
-                }
-            });
-        }
-    });*/
+    $(".listrap").listrap().on("selection-changed", function (event, selection) {
+        console.log(selection);
+    });
+    
 })
 
 // Load is used to ensure all images have been loaded, impossible with document

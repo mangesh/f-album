@@ -242,7 +242,11 @@ $app->get('/home', function () use ($app, $fb) {
             $photos = $fb->get('/'.$each['id'].'/photos?fields=id,picture,name&limit=50')->getDecodedBody();
         }
     }*/
-
+    foreach ($albums_array as $key => $value) {
+        if(!array_key_exists('count', $value)){
+            unset($albums_array[$key]);
+        }
+    }
     //$app->render('index.twig');
     $app->render('home.twig', array(
             'profile_picture'   => $img,
@@ -269,7 +273,7 @@ $app->get('/album', function () use ($app, $model, $fb){
     $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
     $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
     $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source},name&limit=50')->getDecodedBody();
-    //print_r($photos); die();
+    
     foreach ($photos['photos']['data'] as $key => $each) {
         //$pic = $fb->get('/'.$each['id'].'?fields=images')->getDecodedBody();
         //print_r($pic['images'][0]['source']); die();

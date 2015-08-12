@@ -73,33 +73,249 @@ li.css a {
     border-radius: 0;
 }
 
-div.c-wrapper{
-    width: 100%; /* for example */
-    margin: auto;
-}
-
-.carousel-inner > .item > img, 
-.carousel-inner > .item > a > img{
-    /*width: 100%;*/ /* use this, or not */
-    margin: auto;
-}
-
-.carousel-inner > .item > img, .carousel-inner > .item > a > img {
-    /*width: 100%;
-    max-height: 400px;*/
-}
-
-.modal-open .modal {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-    overflow-y: scroll;
-}
-
 .modal-content {
-    background-color: rgba(0,0,0,0.7);
-    background-color: #000; 
+    background-color: rgba(0,0,0,0.8);
 }
-.modal-backdrop
-{
-    opacity:0.5 !important;
+.carousel.carousel-fit {
+  position: relative;
+  /* When sliding, use the maximum height we have */
+  /* Center horizontally the content of the slides */
+  /* To be centered, the images of the slides need to be inline */
+  /* Maximize the captions in the wrapper */
+}
+.carousel.carousel-fit.slide {
+  /* Hide the content outside the carousel when sliding */
+  overflow: hidden;
+}
+.carousel.carousel-fit .carousel-inner > .next,
+.carousel.carousel-fit .carousel-inner > .prev {
+  bottom: 0;
+}
+.carousel.carousel-fit .carousel-inner > .item {
+  text-align: center;
+}
+.carousel.carousel-fit .carousel-inner > .item > img {
+  display: inline-block;
+}
+.carousel.carousel-fit .carousel-inner > .item > .carousel-caption {
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.modal.modal-fullscreen {
+  /* Maximize the main wrappers on the screen */
+  /* Make the parent wrapper of the modal box a full-width block */
+  /* Remove borders and effects on the content */
+  /**
+     * /!\ By using this feature, you force the header and footer to be placed
+     * in an absolute position. You must handle by yourself the margin of the
+     * content.
+     */
+}
+.modal.modal-fullscreen .modal-dialog,
+.modal.modal-fullscreen .modal-content {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.modal.modal-fullscreen .modal-dialog {
+  margin: 0;
+  width: 100%;
+}
+.modal.modal-fullscreen .modal-content {
+  border: none;
+  -moz-border-radius: 0;
+  border-radius: 0;
+  -webkit-box-shadow: inherit;
+  -moz-box-shadow: inherit;
+  -o-box-shadow: inherit;
+  box-shadow: inherit;
+}
+.modal.modal-fullscreen.force-fullscreen {
+  /* Remove the padding inside the body */
+}
+.modal.modal-fullscreen.force-fullscreen .modal-body {
+  padding: 0;
+}
+.modal.modal-fullscreen.force-fullscreen .modal-header,
+.modal.modal-fullscreen.force-fullscreen .modal-footer {
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+.modal.modal-fullscreen.force-fullscreen .modal-header {
+  top: 0;
+}
+.modal.modal-fullscreen.force-fullscreen .modal-footer {
+  bottom: 0;
+}
+
+/* Loader */
+/* :not(:required) hides this rule from IE9 and below */
+.inner-circles-loader:not(:required) {
+  -moz-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  background: rgba(25, 165, 152, 0.5);
+  border-radius: 50%;
+  overflow: hidden;
+  text-indent: -9999px;
+  /* Hides inner circles outside base circle at safari */
+  -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+}
+.inner-circles-loader:not(:required):before, .inner-circles-loader:not(:required):after {
+  content: '';
+  position: absolute;
+  top: 0;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.inner-circles-loader:not(:required):before {
+  -moz-animation: inner-circles-loader 3s infinite;
+  -webkit-animation: inner-circles-loader 3s infinite;
+  animation: inner-circles-loader 3s infinite;
+  -moz-transform-origin: 0 50%;
+  -ms-transform-origin: 0 50%;
+  -webkit-transform-origin: 0 50%;
+  transform-origin: 0 50%;
+  left: 0;
+  background: #c7efcf;
+}
+.inner-circles-loader:not(:required):after {
+  -moz-animation: inner-circles-loader 3s 0.2s reverse infinite;
+  -webkit-animation: inner-circles-loader 3s 0.2s reverse infinite;
+  animation: inner-circles-loader 3s 0.2s reverse infinite;
+  -moz-transform-origin: 100% 50%;
+  -ms-transform-origin: 100% 50%;
+  -webkit-transform-origin: 100% 50%;
+  transform-origin: 100% 50%;
+  right: 0;
+  background: #eef5db;
+}
+
+@-moz-keyframes inner-circles-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  50% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  100% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+@-webkit-keyframes inner-circles-loader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  50% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+@keyframes inner-circles-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  50% {
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  100% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+
+/* Liststrap CSS */
+
+.listrap {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.listrap li {
+    margin: 0;
+    /*padding: 10px;*/
+}
+
+.listrap li.active, .listrap li:hover {
+    cursor: pointer;
+    /*background-color: #d9edf7;*/
+}
+
+.listrap strong {
+    margin-left: 10px;
+}
+
+.listrap .listrap-toggle {
+    display: inline-block;
+    /*width: 60px;
+    height: 60px;*/
+}
+
+.listrap .listrap-toggle span {
+    background-color: #428bca;
+    opacity: 0.8;
+    z-index: 100;
+    width: 60px;
+    height: 60px;
+    display: none;
+    position: absolute;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    vertical-align: middle;
+    color: #ffffff;
+}
+
+.listrap .listrap-toggle span:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e013";
+}
+
+.listrap li.active .listrap-toggle span {
+    display: block;
+}
+
+.d-hide {
+    display: none;
+}
+
+@media (max-width:720px) and (min-width:350px) {
+    .d-hide {
+        display: block;
+    }
 }
