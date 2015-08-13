@@ -184,7 +184,8 @@ $app->get('/callback', function () use ($app, $model, $fb) {
     $user = $response->getGraphUser();
     
     if (isset($user)) {
-        $_SESSION['user_id'] = $user["id"];
+        $_SESSION['user_id']    = $user["id"];
+        $_SESSION['user_name']  = $user["name"];
         $is_user_exists = $model->getUser($user["id"]);
 
         if (!$is_user_exists) {
@@ -250,6 +251,7 @@ $app->get('/home', function () use ($app, $fb) {
     //$app->render('index.twig');
     $app->render('home.twig', array(
             'profile_picture'   => $img,
+            'name'              => $_SESSION['user_name'],
             'albums'            => $albums_array
         ));
 

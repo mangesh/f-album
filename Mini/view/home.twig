@@ -1,21 +1,30 @@
 {% extends "_home_base.twig" %}
 {% block content %}
-    <div id="grid" class="container">
-        <ul id="albums" class="listrap">
+    <div id="grid" class="container_ album-container">
+        <ul id="albums" class="">
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
-                <div class="listrap-toggle">
-                    <span></span>
-                    <!-- <a href="#" id="{{album.id}}" class="load-album"> -->
-                        <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
-                        <strong class="d-hide">{{album.name}}</strong>
-                    <!-- </a> -->
+                <div class="">
+                    <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
+                    <strong class="d-hide">{{album.name}}</strong>
                 </div>
             </li>
             {% endfor %}
         </ul>
     </div>
-    
+    <div id="grid" class="container">
+        <ul class="listrap">
+            {% for album in albums %}
+            <li id="{{album.id}}" class="">
+                <div class="listrap-toggle">
+                    <span></span>
+                    <img class="img-circle" alt="Album Cover" src="{{album.picture.url}}" style="width:60px;height:60px;">
+                </div>
+                <strong class="d-hide">{{album.name}}</strong>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
     <div class="modal fade bs-example-modal-lg modal-vcenter_ modal-fullscreen force-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="openModal">
         <div class="modal-dialog modal-lg">
             
