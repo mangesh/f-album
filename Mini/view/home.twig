@@ -1,10 +1,26 @@
 {% extends "_home_base.twig" %}
 {% block content %}
-    <div id="grid" class="container_ album-container">
+        
+    <div id="grid" class="container album-container">
+        <div id="mode-group" class="btn-group btn-group-sm" data-toggle="buttons">
+            <label class="btn btn-default disabled">
+                <input type="radio" id="option1"> Mode:
+            </label>
+            <label class="btn btn-info active">
+                <input type="radio" name="mode" value="view" id="option2"> View
+            </label>
+            <label class="btn btn-info">
+                <input type="radio" name="mode" value="download" id="option3"> Download
+            </label>
+            <label class="btn btn-info">
+                <input type="radio" name="mode" value="upload" id="option4"> Upload to G+
+            </label>
+        </div>
         <ul id="albums" class="">
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
                 <div class="">
+                    <span></span>
                     <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
                     <strong class="d-hide">{{album.name}}</strong>
                 </div>
@@ -12,7 +28,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div id="grid" class="container">
+    <!-- <div id="grid" class="container">
         <ul class="listrap">
             {% for album in albums %}
             <li id="{{album.id}}" class="">
@@ -24,7 +40,7 @@
             </li>
             {% endfor %}
         </ul>
-    </div>
+    </div> -->
     <div class="modal fade bs-example-modal-lg modal-vcenter_ modal-fullscreen force-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="openModal">
         <div class="modal-dialog modal-lg">
             

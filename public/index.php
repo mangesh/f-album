@@ -267,6 +267,16 @@ $app->get('/clearsession', function () use ($app) {
     exit;
 });
 
+// This is nothing but a logout page
+$app->get('/sign-out', function () use ($app) {
+    /* Load and clear sessions */
+    session_destroy();
+     
+    /* Redirect to page with the connect to Twitter option. */
+    $app->redirect('/');
+    exit;
+});
+
 // // GET request on /album/:id. Should be self-explaining. 
 $app->get('/album', function () use ($app, $model, $fb){
 
