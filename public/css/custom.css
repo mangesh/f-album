@@ -9,17 +9,6 @@ a:hover {
   color: #fff;
 }
 
-/* Custom default button */
-.btn-default,
-.btn-default:hover,
-.btn-default:focus {
-    color: #333;
-    text-shadow: none; /* Prevent inheritence from `body` */
-    background-color: #fff;
-    border: 1px solid #fff;
-}
-
-
 /*
  * Base structure
  */
@@ -109,13 +98,13 @@ li.profile-picture img {
 }
 
 .album-container{
-    margin-top: 95px;
+    margin-top: 65px;
 }
 ul#albums {
     list-style-type: none;
     text-align: left;
     padding: 0px;
-    margin-top: 90px;
+    margin-top: 15px;
     cursor: pointer;
 }
 
@@ -234,105 +223,6 @@ li.css a {
   bottom: 0;
 }
 
-/* Loader */
-/* :not(:required) hides this rule from IE9 and below */
-.inner-circles-loader:not(:required) {
-  -moz-transform: translate3d(0, 0, 0);
-  -ms-transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  background: rgba(25, 165, 152, 0.5);
-  border-radius: 50%;
-  overflow: hidden;
-  text-indent: -9999px;
-  /* Hides inner circles outside base circle at safari */
-  -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-}
-.inner-circles-loader:not(:required):before, .inner-circles-loader:not(:required):after {
-  content: '';
-  position: absolute;
-  top: 0;
-  display: inline-block;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-}
-.inner-circles-loader:not(:required):before {
-  -moz-animation: inner-circles-loader 3s infinite;
-  -webkit-animation: inner-circles-loader 3s infinite;
-  animation: inner-circles-loader 3s infinite;
-  -moz-transform-origin: 0 50%;
-  -ms-transform-origin: 0 50%;
-  -webkit-transform-origin: 0 50%;
-  transform-origin: 0 50%;
-  left: 0;
-  background: #c7efcf;
-}
-.inner-circles-loader:not(:required):after {
-  -moz-animation: inner-circles-loader 3s 0.2s reverse infinite;
-  -webkit-animation: inner-circles-loader 3s 0.2s reverse infinite;
-  animation: inner-circles-loader 3s 0.2s reverse infinite;
-  -moz-transform-origin: 100% 50%;
-  -ms-transform-origin: 100% 50%;
-  -webkit-transform-origin: 100% 50%;
-  transform-origin: 100% 50%;
-  right: 0;
-  background: #eef5db;
-}
-
-@-moz-keyframes inner-circles-loader {
-  0% {
-    -moz-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  50% {
-    -moz-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-  100% {
-    -moz-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-}
-@-webkit-keyframes inner-circles-loader {
-  0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  50% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-  100% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-}
-@keyframes inner-circles-loader {
-  0% {
-    -moz-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  50% {
-    -moz-transform: rotate(360deg);
-    -ms-transform: rotate(360deg);
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-  100% {
-    -moz-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-}
-
 /* Liststrap CSS */
 
 .listrap {
@@ -399,4 +289,28 @@ li.css a {
     .d-hide {
         display: block;
     }
+}
+
+.download-album span {
+    background-color: #000;
+    opacity: 0.8;
+    z-index: 19;
+    width: 45px;
+    height: 45px;
+    display: none;
+    position: absolute;
+    /*border-radius: 50%;*/
+    text-align: center;
+    line-height: 45px;
+    vertical-align: middle;
+    color: #ffffff;
+}
+
+.download-album span:before {
+    font-family: 'Glyphicons Halflings';
+    content: "\e013";
+}
+
+.download-album.active span {
+    display: block;
 }

@@ -17,7 +17,7 @@
 
         <div class="navbar-wrapper">
             <div class="container">
-                <nav class="navbar navbar-inverse navbar-static-top">
+                <nav class="navbar navbar-inverse navbar-fixed-top">
                     <div class="container">
                         <div class="navbar-header">
                             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -29,7 +29,7 @@
                             <a class="navbar-brand" href="#">fb Photos</a>
                         </div>
                         <div id="navbar" class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav navbar-left">
+                            <!-- <ul class="nav navbar-nav navbar-left">
                                 <li class="active"><a href="#">Home</a></li>
                                 <li><a href="#about">About</a></li>
                                 <li><a href="#contact">Contact</a></li>
@@ -45,16 +45,14 @@
                                         <li><a href="#">One more separated link</a></li>
                                     </ul>
                                 </li>
-                            </ul>
+                            </ul> -->
                             <ul class="nav navbar-nav navbar-right">
                                 <li class="dropdown profile-picture">
                                     <a href="#" class="dropdown-toggle profile-image" data-toggle="dropdown">
                                         <img src="{{profile_picture}}" class="img-circle"> {{name}} <b class="caret"></b>
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#"><i class="fa fa-cog"></i> Account</a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="#"><i class="fa fa-sign-out"></i> Sign-out</a></li>
+                                        <li><a href="/sign-out"><i class="fa fa-sign-out"></i>Sign-out</a></li>
                                     </ul>
                                 </li>
                             </ul>

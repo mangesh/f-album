@@ -26,8 +26,30 @@ jQuery.fn.extend({
 
 $(function () {
     //$('#albums').hide();
+    if($('#mode-group input[name="mode"]').length !== 0){
+        $('#mode-group input[name="mode"]').on('change', function (e) {
+            var _this = $(this);
+            if (_this.val() == 'download') {
+                $('.album').removeClass('load-album').addClass('download-album');
+            };
+        })
+    }
+
+    //if ($('.download-album').length !== 0) {
+        $(document).on('click', '.download-album', function (e) {
+            e.preventDefault();
+            var _this = $(this);
+            _this.toggleClass("active");
+            var selection = new Array();
+            $(".download-album.active").each(function (ix, el) {
+                selection.push($(el)[0]);
+            });
+            console.log(selection);
+        })
+    //}
+
     if ($('.load-album').length !== 0) {
-        $('.load-album').on('click', function (e) {
+        $(document).on('click', '.load-album', function (e) {
             e.preventDefault();
             $.ajax({
                 method: "GET",
@@ -51,7 +73,12 @@ $(function () {
                 $('.carousel-inner div').eq(0).addClass('active');
                 
                 $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
-                $('#openModal').modal({show:true});
+                $('.carousel').imagesLoaded( function() {
+                    console.log('images loaded');
+                    $('#openModal').modal({show:true});
+                    //$('.carousel').masonry();
+                });
+                //$('#openModal').modal({show:true});
                 
             }).fail(function () {
             }).always(function () {
@@ -103,15 +130,17 @@ $(function () {
         percentPosition: true,
         gutter: gutter,
         itemSelector: '.album',
-        columnWidth: '.album'
+        columnWidth: '.album',
+        //isAnimated: !Modernizr.csstransitions,
+        isFitWidth: true
     });
     // layout Isotope after each image loads
     $grid.imagesLoaded().progress( function() {
         $grid.masonry();
     });
 
-    jQuery(window).bind('resize', function () {
-        if (!jQuery('#albums').parent().hasClass('container')) {
+    /*jQuery(window).bind('resize', function () {
+        //if (!jQuery('#albums').parent().hasClass('container')) {
             // Resets all widths to 'auto' to sterilize calculations
             post_width = jQuery('.album').width() + gutter;
             //console.log(gutter);
@@ -126,8 +155,8 @@ $(function () {
             }// Ensures that all top-level elements have equal width and stay centered
             jQuery('#albums, #grid').css('width', posts_width);
             jQuery('#grid').css({'margin': '0 auto'});
-        }
-    }).trigger('resize');
+         //}
+    }).trigger('resize');*/
     
 })
 
