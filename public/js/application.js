@@ -60,7 +60,10 @@ $(function () {
     }
 
     $('#openModal').on('shown.bs.modal', function () {
-        $('.carousel').carousel();
+        $carousel = $('.carousel').imagesLoaded( function() {
+            $carousel.carousel();
+        })
+        /*$('.carousel').carousel();*/
         /*$('.inner-circles-loader').show();
         var carousel = $(this).find('.carousel').hide();
         var deferreds = [];
