@@ -26,12 +26,19 @@ jQuery.fn.extend({
 
 $(function () {
     //$('#albums').hide();
+    $('#download-mode-group').slideUp();
     if($('#mode-group input[name="mode"]').length !== 0){
         $('#mode-group input[name="mode"]').on('change', function (e) {
             var _this = $(this);
             if (_this.val() == 'download') {
                 $('.album').removeClass('load-album').addClass('download-album');
-            };
+                $('#download-mode-group').slideDown();
+            } else {
+                console.log('hi');
+                $('.album').removeClass('download-album').addClass('load-album');
+                $('#download-mode-group').button('reset');
+                $('#download-mode-group').slideUp();
+            }
         })
     }
 
@@ -73,11 +80,11 @@ $(function () {
                 $('.carousel-inner div').eq(0).addClass('active');
                 
                 $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
-                $('.carousel').imagesLoaded( function() {
-                    console.log('images loaded');
+                //$('.carousel').imagesLoaded( function() {
+                    //console.log('images loaded');
                     $('#openModal').modal({show:true});
                     //$('.carousel').masonry();
-                });
+                //});
                 //$('#openModal').modal({show:true});
                 
             }).fail(function () {
@@ -87,8 +94,11 @@ $(function () {
     }
 
     $('#openModal').on('shown.bs.modal', function () {
+        //$carousel = $('.carousel').imagesLoaded( function() {
+        $carousel.carousel().hide();
+        //})
         $carousel = $('.carousel').imagesLoaded( function() {
-            $carousel.carousel();
+            carousel.fadeIn(1000);
         })
         /*$('.carousel').carousel();*/
         /*$('.inner-circles-loader').show();
@@ -120,12 +130,8 @@ $(function () {
         $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
     });
 
-    $(".listrap").listrap().on("selection-changed", function (event, selection) {
-        console.log(selection);
-    });
-
     var gutter = parseInt(jQuery('.album').css('marginBottom'));
-    console.log(gutter);
+    
     var $grid = $('#albums').masonry({
         percentPosition: true,
         gutter: gutter,

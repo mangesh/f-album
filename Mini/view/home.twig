@@ -16,6 +16,19 @@
                 <input type="radio" name="mode" value="upload" id="option4"> Upload to G+
             </label>
         </div>
+        <div class="clear"></div>
+        <div id="download-mode-group" class="btn-group btn-group-xs" data-toggle="buttons">
+            <!-- <label class="btn btn-default disabled">
+                <input type="radio" id="option1"> Select:
+            </label> -->
+            <label class="btn btn-info active">
+                <input type="radio" name="select" value="multiple" id="option2"> Multiple
+            </label>
+            <label class="btn btn-info">
+                <input type="radio" name="select" value="all" id="option3"> All
+            </label>
+        </div>
+        <div class="clear"></div>
         <ul id="albums" class="">
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
