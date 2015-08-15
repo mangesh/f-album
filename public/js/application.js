@@ -32,36 +32,40 @@ $(function () {
             var _this = $(this);
             if (_this.val() == 'download') {
                 $('.album').removeClass('load-album').addClass('download-album');
-                $('#download-mode-group').slideDown();
+                $('#download-mode-group').removeClass('hide');
             } else {
                 console.log('hi');
                 $('.album').removeClass('download-album').addClass('load-album');
                 $('#download-mode-group').button('reset');
-                $('#download-mode-group').slideUp();
+                $('#download-mode-group').addClass('hide');
             }
         })
     }
 
-    //if ($('.download-album').length !== 0) {
-        $(document).on('click', '.download-album', function (e) {
-            e.preventDefault();
-            var _this = $(this);
-            _this.toggleClass("active");
-            var selection = new Array();
-            $(".download-album.active").each(function (ix, el) {
-                selection.push($(el)[0]);
-            });
-            console.log(selection);
-        })
-    //}
+    $(document).on('click', '.download-album', function (e) {
+        e.preventDefault();
+        var _this = $(this);
+        _this.toggleClass("active").toggleClass("selected");
+        var selection = new Array();
+        $(".download-album.selected").each(function (ix, el) {
+            selection.push($(el)[0]);
+        });
+        if ( selection.length > 0 ) {
+            $('.download').prop('disabled', true);
+            $('.selected-albums').prop('disabled', false);
+        } else {
+            $('.download').prop('disabled', false);
+            $('.selected-albums').prop('disabled', true);
+        }
+    })
 
     if ($('.load-album').length !== 0) {
-        $(document).on('click', '.load-album', function (e) {
+        $(document).on('click', '.load-album img', function (e) {
             e.preventDefault();
             $.ajax({
                 method: "GET",
                 url: "/album",
-                data: { id: $(this).attr('id') },
+                data: { id: $(this).parents('li').attr('id') },
                 dataType: "json"
             }).done(function (result) {
                 var div;
@@ -79,7 +83,51 @@ $(function () {
                 })
                 $('.carousel-inner div').eq(0).addClass('active');
                 
-                $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+                //$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+                //$('.carousel').imagesLoaded( function() {
+                    //console.log('images loaded');
+                    $('#openModal').modal({show:true});
+                    //$('.carousel').masonry();
+                //});
+                //$('#openModal').modal({show:true});
+                
+            }).fail(function () {
+            }).always(function () {
+            })
+        })
+        
+        $(document).on('click', '.load-album button, .selected-albums', function (e) {
+            e.preventDefault();
+            
+            if($(this).hasClass('download')){
+                $(this).parents('li').addClass('selected');
+            }
+            var array = jQuery('#albums li.selected').map(function(){
+                return 'id[]=' + this.id
+            }).get();
+
+            $.ajax({
+                method: "GET",
+                url: "/album/download",
+                data: array.join('&'),
+                dataType: "json"
+            }).done(function (result) {
+                var div;
+                var img;
+                var li;
+                $('.carousel-inner').html('');
+                $.each(result, function(p,i){
+                    console.log(i);
+                    div = $('<div>');
+                    div.addClass('item');
+                    img = $('<img>').appendTo(div);
+                    img.attr('src',i.picture).attr('alt','image'+(p+1)).addClass('img-responsive');
+                    img.appendTo(div);
+                    div.appendTo('.carousel-inner');
+                })
+                $('.carousel-inner div').eq(0).addClass('active');
+                
+                //$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
                 //$('.carousel').imagesLoaded( function() {
                     //console.log('images loaded');
                     $('#openModal').modal({show:true});
@@ -95,10 +143,10 @@ $(function () {
 
     $('#openModal').on('shown.bs.modal', function () {
         //$carousel = $('.carousel').imagesLoaded( function() {
-        $carousel.carousel().hide();
+        var $carousel = $('.carousel').carousel().hide();
         //})
-        $carousel = $('.carousel').imagesLoaded( function() {
-            carousel.fadeIn(1000);
+        $('.carousel').imagesLoaded( function() {
+            $carousel.show();
         })
         /*$('.carousel').carousel();*/
         /*$('.inner-circles-loader').show();
@@ -127,7 +175,7 @@ $(function () {
     });
 
     $(window).on('resize', function(){
-        $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+        ///$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
     });
 
     var gutter = parseInt(jQuery('.album').css('marginBottom'));

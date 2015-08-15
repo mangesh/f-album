@@ -5,13 +5,26 @@
 // Configuration for error reporting, useful to show every little problem during development
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
+set_time_limit(0);
 session_start();
+
+if (!extension_loaded('openssl')) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        dl('php_openssl.dll');
+    } else {
+        dl('openssl.so');
+    }
+}
 
 // Load Composer's PSR-4 autoloader (necessary to load Slim, Mini etc.)
 require '../lib/vendor/autoload.php';
 
+use Alchemy\Zippy\Zippy;
+
 // Initialize Slim (the router/micro framework used)
-$app = new \Slim\Slim();
+$app = new \Slim\Slim(array(
+    'mode' => 'development'
+));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
 $app->view = new \Slim\Views\Twig();
@@ -65,6 +78,7 @@ $app->configureMode('production', function () use ($app) {
     // Set the configs for production environment
     $app->config(array(
         'debug' => false,
+        'log.enable' => true,
         'database' => array(
             'db_host' => '',
             'db_port' => '',
@@ -277,8 +291,99 @@ $app->get('/sign-out', function () use ($app) {
     exit;
 });
 
-// // GET request on /album/:id. Should be self-explaining. 
-$app->get('/album', function () use ($app, $model, $fb){
+function recursiveRemoveDirectory($directory)
+{
+    foreach(glob("{$directory}/*") as $file)
+    {
+        if(is_dir($file)) { 
+            recursiveRemoveDirectory($file);
+        } else {
+            unlink($file);
+        }
+    }
+    rmdir($directory);
+}
+
+// GET request on /album/:id. Should be self-explaining. 
+$app->group('/album', function () use ($app, $model, $fb){
+
+    $app->get('/', function () use ($app, $model, $fb) {
+
+        $album_id = $_GET['id'];
+    
+        $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
+        $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source},name&limit=50')->getDecodedBody();
+        
+        foreach ($photos['photos']['data'] as $key => $each) {
+            $photos['data'][$key]['picture'] = $each['source'];    
+        }
+
+        $app->contentType('application/json;charset=utf-8');
+        echo json_encode($photos['data']);
+ 
+    });
+
+    
+    $app->get('/download', function () use ($app, $model, $fb){
+        
+        $album_ids = $_GET['id'];
+        $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
+        foreach ($album_ids as $key => $album_id) {
+            
+            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source,name},name&limit=50')->getDecodedBody();
+
+            if (!file_exists('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'])) {
+                mkdir('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'], 0777, true);
+            }
+            $folders[] = 'user_albums/'.$_SESSION['user_id'].'/'.$photos['name'];
+            foreach ($photos['photos']['data'] as $key => $each) {
+                $photos['data'][$key]['picture'] = $each['source'];    
+                
+                $fp = fopen('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
+                $ch = curl_init($each['source']);
+                curl_setopt($ch, CURLOPT_NOPROGRESS, false );
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                curl_setopt($ch, CURLOPT_FILE, $fp);
+                $success = curl_exec($ch);
+                $curl_info = curl_getinfo($ch);
+                curl_close($ch);
+                fclose($fp);
+                
+            }
+            
+        }
+        if (count($album_ids)>1) {
+            $album_name = 'albums';
+        } else {
+            $album_name = 'album';
+        }
+        $zippy = Zippy::load();
+        $archive = $zippy->create('user_albums/'.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders, $recurssive = true);
+        
+        if (!file_exists('user_albums/'.$_SESSION['user_id'])) {
+            mkdir('user_albums/'.$_SESSION['user_id'], 0777, true);
+        }
+
+        copy('user_albums/'.$_SESSION['user_id'].'_'.$album_name.'.zip','user_albums/'.$_SESSION['user_id'].'/'.$album_name.'.zip');
+        
+        //chdir('user_albums');
+        //chmod($_SESSION['user_id'].'_'.'albums'.'.zip',0777);
+        //unlink($_SESSION['user_id'].'_'.'albums'.'.zip');
+        //chdir('..');
+
+        foreach ($folders as $key => $folder) {
+            recursiveRemoveDirectory($folder);
+        }
+        
+        $app->contentType('application/json;charset=utf-8');
+        echo json_encode(array('download_link' => 'user_albums/'.$_SESSION['user_id'].'/'.$album_name.'.zip'));
+        
+    });
+});
+
+// // GET request on /download-albums.
+$app->get('/download-albums', function () use ($app, $model, $fb){
 
     $album_id = $_GET['id'];
     

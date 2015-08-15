@@ -17,25 +17,40 @@
             </label>
         </div>
         <div class="clear"></div>
-        <div id="download-mode-group" class="btn-group btn-group-xs" data-toggle="buttons">
+        <div id="download-mode-group" class="btn-group btn-group-xs hide" role="group">
+            <button type="button" class="btn btn-info selected-albums " disabled="disabled">Selected Albums</button>
+            <button type="button" class="btn btn-info">All Albums</button>
             <!-- <label class="btn btn-default disabled">
-                <input type="radio" id="option1"> Select:
-            </label> -->
+                <input type="radio" id="option1"> Download:
+            </label>
             <label class="btn btn-info active">
-                <input type="radio" name="select" value="multiple" id="option2"> Multiple
+                <input type="button" name="selected" value="multiple" id="option2"> Selected Albums
             </label>
             <label class="btn btn-info">
-                <input type="radio" name="select" value="all" id="option3"> All
-            </label>
+                <input type="button" name="selectall" value="all" id="option3"> All Albums
+            </label> -->
         </div>
         <div class="clear"></div>
+        <div class="alert alert-success alert-dismissible link-alert fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <strong>Download link:</strong> <span class='link'></span>
+        </div>
         <ul id="albums" class="">
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
                 <div class="">
                     <span></span>
                     <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
-                    <strong class="d-hide">{{album.name}}</strong>
+                    <!-- <strong class="d-hide">{{album.name}}</strong> -->
+                    <div class="download-btn">
+                        <p>
+                            <button type="button" class="btn btn-primary btn-xs download">Download</button>
+                            <!-- <label class="pull-right">
+                                <input type="checkbox">
+                            </label> -->
+                        </p>
+                    </div>
+                    
                 </div>
             </li>
             {% endfor %}

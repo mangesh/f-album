@@ -104,7 +104,10 @@ ul#albums {
     list-style-type: none;
     text-align: left;
     padding: 0px;
-    margin-top: 30px;
+    margin-top: 10px;
+}
+
+ul#albums img{
     cursor: pointer;
 }
 
@@ -126,6 +129,19 @@ div.img-div{
 .img-div img{
     -webkit-transform:translate(-50%);
     margin-left:100px;
+}
+
+.download-btn {
+    padding: 10px 10px;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 0px 0px 8px 8px; 
+    -moz-border-radius: 0px 0px 8px 8px; 
+    -webkit-border-radius: 0px 0px 8px 8px; 
+    /*border: 2px solid #949494;*/
+}
+
+.download-btn p{
+    margin-bottom: 0px;
 }
 
 .flex-caption {
@@ -289,6 +305,10 @@ li.css a {
     .d-hide {
         display: block;
     }
+}
+
+#download-mode-group {
+    margin-top: 10px;
 }
 
 .download-album span {
