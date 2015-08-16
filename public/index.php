@@ -251,14 +251,14 @@ $app->get('/home', function () use ($app, $fb) {
 
     $albums = $fb->next($albums);
     $albums_array = array_merge($albums_array, $albums->asArray());
-
+    //var_dump($albums_array); die();
     /*if(is_array($albums)){
         foreach ($albums as $key => $each){
             $photos = $fb->get('/'.$each['id'].'/photos?fields=id,picture,name&limit=50')->getDecodedBody();
         }
     }*/
     foreach ($albums_array as $key => $value) {
-        if(!array_key_exists('count', $value)){
+        if(($value['count'] == 0)){
             unset($albums_array[$key]);
         }
     }
@@ -326,20 +326,25 @@ $app->group('/album', function () use ($app, $model, $fb){
     
     $app->get('/download', function () use ($app, $model, $fb){
         
-        $album_ids = $_GET['id'];
+        $album_ids      = $_GET['id'];
+        $time           = time();
+        $user_album_dir = 'user_albums/'.$_SESSION['user_id'];
         $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
+        if (file_exists($user_album_dir)) {
+            recursiveRemoveDirectory($user_album_dir);
+        }
         foreach ($album_ids as $key => $album_id) {
             
             $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source,name},name&limit=50')->getDecodedBody();
 
-            if (!file_exists('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'])) {
-                mkdir('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'], 0777, true);
+            if (!file_exists($user_album_dir.'/'.$photos['name'])) {
+                mkdir($user_album_dir.'/'.$photos['name'], 0777, true);
             }
-            $folders[] = 'user_albums/'.$_SESSION['user_id'].'/'.$photos['name'];
+            $folders[] = $user_album_dir.'/'.$photos['name'];
             foreach ($photos['photos']['data'] as $key => $each) {
                 $photos['data'][$key]['picture'] = $each['source'];    
                 
-                $fp = fopen('user_albums/'.$_SESSION['user_id'].'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
+                $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
                 $ch = curl_init($each['source']);
                 curl_setopt($ch, CURLOPT_NOPROGRESS, false );
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -359,13 +364,15 @@ $app->group('/album', function () use ($app, $model, $fb){
             $album_name = 'album';
         }
         $zippy = Zippy::load();
-        $archive = $zippy->create('user_albums/'.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders, $recurssive = true);
+        $archive = $zippy->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders, $recurssive = true);
         
-        if (!file_exists('user_albums/'.$_SESSION['user_id'])) {
-            mkdir('user_albums/'.$_SESSION['user_id'], 0777, true);
+        if (!file_exists($user_album_dir)) {
+            mkdir($user_album_dir, 0777, true);
         }
 
-        copy('user_albums/'.$_SESSION['user_id'].'_'.$album_name.'.zip','user_albums/'.$_SESSION['user_id'].'/'.$album_name.'.zip');
+        $zip_path   = 'user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip';
+        $dest       = $user_album_dir.'/'.$album_name.'.zip';
+        copy($zip_path,$dest);
         
         //chdir('user_albums');
         //chmod($_SESSION['user_id'].'_'.'albums'.'.zip',0777);
@@ -375,9 +382,13 @@ $app->group('/album', function () use ($app, $model, $fb){
         foreach ($folders as $key => $folder) {
             recursiveRemoveDirectory($folder);
         }
-        
+        /*chdir('user_albums');
+        chmod($time.$_SESSION['user_id'].'_'.$album_name.'.zip', 0777);
+        sleep(1);
+        unlink($time.$_SESSION['user_id'].'_'.$album_name.'.zip');
+        chdir('..');*/
         $app->contentType('application/json;charset=utf-8');
-        echo json_encode(array('download_link' => 'user_albums/'.$_SESSION['user_id'].'/'.$album_name.'.zip'));
+        echo json_encode(array('download_link' => $user_album_dir.'/'.$album_name.'.zip'));
         
     });
 });

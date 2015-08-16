@@ -32,6 +32,7 @@ $(function () {
             var _this = $(this);
             if (_this.val() == 'download') {
                 $('.album').removeClass('load-album').addClass('download-album');
+                $('.selected').removeClass('selected');
                 $('#download-mode-group').removeClass('hide');
             } else {
                 console.log('hi');
@@ -96,12 +97,28 @@ $(function () {
             })
         })
         
-        $(document).on('click', '.load-album button, .selected-albums', function (e) {
+        $(document).on('click', '.load-album button, .selected-albums, .all-albums', function (e) {
             e.preventDefault();
             
             if($(this).hasClass('download')){
+                $('.selected').removeClass('selected');
                 $(this).parents('li').addClass('selected');
             }
+            var result = false;
+            if($(this).hasClass('all-albums')){
+                $('.download-album').removeClass("active").removeClass("selected");
+                $('.download-album').addClass("active").addClass("selected");
+                /*BootstrapDialog.confirm('Hi Apple, are you sure?', function(result){
+                    if(result) {
+                        $('.download-album').removeClass("active").removeClass("selected");
+                        $('.download-album').addClass("active").addClass("selected");
+                    }else {
+                        $('.download-album').removeClass("active").removeClass("selected");
+                        return false;
+                    }
+                });*/
+            }
+            console
             var array = jQuery('#albums li.selected').map(function(){
                 return 'id[]=' + this.id
             }).get();
@@ -112,28 +129,9 @@ $(function () {
                 data: array.join('&'),
                 dataType: "json"
             }).done(function (result) {
-                var div;
-                var img;
-                var li;
-                $('.carousel-inner').html('');
-                $.each(result, function(p,i){
-                    console.log(i);
-                    div = $('<div>');
-                    div.addClass('item');
-                    img = $('<img>').appendTo(div);
-                    img.attr('src',i.picture).attr('alt','image'+(p+1)).addClass('img-responsive');
-                    img.appendTo(div);
-                    div.appendTo('.carousel-inner');
-                })
-                $('.carousel-inner div').eq(0).addClass('active');
                 
-                //$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
-                //$('.carousel').imagesLoaded( function() {
-                    //console.log('images loaded');
-                    $('#openModal').modal({show:true});
-                    //$('.carousel').masonry();
-                //});
-                //$('#openModal').modal({show:true});
+                $('.link-alert .link').attr('href',result.download_link);
+                $('.link-alert').show();
                 
             }).fail(function () {
             }).always(function () {
