@@ -31,14 +31,23 @@ $(function () {
         $('#mode-group input[name="mode"]').on('change', function (e) {
             var _this = $(this);
             if (_this.val() == 'download') {
-                $('.album').removeClass('load-album').addClass('download-album');
+                $('.load-album button,.upload-album button').removeClass('upload').addClass('download').html('Download');
+                $('.album').removeClass('load-album upload-album').addClass('download-album');
                 $('.selected').removeClass('selected');
                 $('#download-mode-group').removeClass('hide');
+                $('.selected-picasa-albums').addClass('selected-albums').removeClass('selected-picasa-albums');
+            } else if (_this.val() == 'upload'){
+                $('.load-album button,.download-album button').addClass('upload').removeClass('download').html('Upload');
+                $('.album').removeClass('load-album download-album').addClass('upload-album');
+                $('.selected').removeClass('selected');
+                $('#download-mode-group').removeClass('hide');
+                $('.selected-albums').addClass('selected-picasa-albums').removeClass('selected-albums');
             } else {
-                console.log('hi');
-                $('.album').removeClass('download-album').addClass('load-album');
+                $('.album').removeClass('download-album upload-album').addClass('load-album');
                 $('#download-mode-group').button('reset');
                 $('#download-mode-group').addClass('hide');
+                $('.download-album button,.upload-album button').removeClass('download upload');
+                $('.selected-picasa-albums,.selected-albums').addClass('selected-picasa-albums selected-albums');
             }
         })
     }
@@ -57,6 +66,23 @@ $(function () {
         } else {
             $('.download').prop('disabled', false);
             $('.selected-albums').prop('disabled', true);
+        }
+    })
+
+    $(document).on('click', '.upload-album', function (e) {
+        e.preventDefault();
+        var _this = $(this);
+        _this.toggleClass("active").toggleClass("selected");
+        var selection = new Array();
+        $(".upload-album.selected").each(function (ix, el) {
+            selection.push($(el)[0]);
+        });
+        if ( selection.length > 0 ) {
+            $('.upload').prop('disabled', true);
+            $('.selected-picasa-albums').prop('disabled', false);
+        } else {
+            $('.upload').prop('disabled', false);
+            $('.selected-picasa-albums').prop('disabled', true);
         }
     })
 
@@ -99,23 +125,34 @@ $(function () {
         
         $(document).on('click', '.all-albums', function (e) {
 
-            $('.download-album').removeClass("active").removeClass("selected");
-            $('.download-album').addClass("active").addClass("selected");
-            BootstrapDialog.confirm('Hi Apple, are you sure?', function(result){
+            BootstrapDialog.confirm('Are you sure?', function(result){
                 if(result) {
-                    $('.download-album').removeClass("active").removeClass("selected");
-                    $('.download-album').addClass("active").addClass("selected");
-                    $('.selected-albums').prop('disabled', false);
-                    $('.selected-albums').trigger('click');
+                    if($('.download-album').length > 0){
+                        $('.download-album').removeClass("active").removeClass("selected");
+                        $('.download-album').addClass("active").addClass("selected");
+                        $('.selected-albums').prop('disabled', false);
+                        $('.selected-albums').trigger('click');
+                    } else {
+                        $('.upload-album').removeClass("active").removeClass("selected");
+                        $('.upload-album').addClass("active").addClass("selected");
+                        $('.selected-picasa-albums').prop('disabled', false);
+                        $('.selected-picasa-albums').trigger('click');
+                    }
                 }else {
-                    $('.selected-albums').prop('disabled', false);
-                    $('.download-album').removeClass("active").removeClass("selected");
+                    if($('.download-album').length > 0){
+                        $('.selected-albums').prop('disabled', false);
+                        $('.download-album').removeClass("active").removeClass("selected");
+                    } else {
+                        $('.selected-picasa-albums').prop('disabled', false);
+                        $('.upload-album').removeClass("active").removeClass("selected");
+                    }
                     return false;
                 }
             });
             
         })
-        $(document).on('click', '.load-album button, .selected-albums', function (e) {
+
+        $(document).on('click', 'button.download, .selected-albums', function (e) {
             e.preventDefault();
             
             if($(this).hasClass('download')){
@@ -136,6 +173,33 @@ $(function () {
                 
                 $('.link-alert .link').attr('href',result.download_link);
                 $('.link-alert').show();
+                
+            }).fail(function () {
+            }).always(function () {
+            })
+        })
+
+        $(document).on('click', 'button.upload, .selected-picasa-albums', function (e) {
+            e.preventDefault();
+            
+            if($(this).hasClass('upload')){
+                $('.selected').removeClass('selected');
+                $(this).parents('li').addClass('selected');
+            }
+            
+            var array = jQuery('#albums li.selected').map(function(){
+                return 'id[]=' + this.id
+            }).get();
+
+            $.ajax({
+                method: "GET",
+                url: "/album/upload",
+                data: array.join('&'),
+                dataType: "json"
+            }).done(function (result) {
+                
+                //$('.link-alert .link').attr('href',result.download_link);
+                //$('.link-alert').show();
                 
             }).fail(function () {
             }).always(function () {
@@ -249,3 +313,22 @@ jQuery(window).load(function () {
         }
     }).trigger('resize');*/
 });
+
+function authorize()
+{
+  var oauthWindow = window.open("https://accounts.google.com/o/oauth2/auth?scope=https://picasaweb.google.com/data/&response_type=code&access_type=offline&redirect_uri=http://fb.dev/google_callback&approval_prompt=force&client_id=548862589391-v5so882uie6k657ehpptta1p665uvscu.apps.googleusercontent.com","_blank","width=700,height=400");
+  if(!oauthWindow || oauthWindow.closed || typeof oauthWindow.closed=='undefined')
+  {
+    // popup blocked, for example on ios you can't programatically
+    // launch a popup from a tab that was a programatically launched popup
+    alert('Failed');      
+  }
+  // else flow is now in the popup
+  // we have designed it to trigger our oauthComplete when finished
+  // we will remain idle until then
+}
+
+function oauthComplete()
+{
+  console.log('auth complete');
+}

@@ -40,9 +40,9 @@
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
                 <div class="">
-                    <strong class="d-hide_">{{album.name}}</strong>
+                    <span class="d-hide">{{album.name}}</span>
                     <span></span>
-                    <img class="img-circle_" alt="Album Cover" src="{{album.picture.url}}">
+                    <img class="img-circle_" alt="{{album.name}}" title="{{album.name}}" src="{{album.picture.url}}">
                     <!-- <strong class="d-hide">{{album.name}}</strong> -->
                     <div class="download-btn">
                         <p>

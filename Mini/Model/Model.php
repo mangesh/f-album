@@ -46,11 +46,20 @@ class Model
      */
     public function getUser($user_id)
     {
-        $sql = "SELECT ID, user_id, name, email, g_token FROM user WHERE user_id = :user_id LIMIT 1";
+        $sql = "SELECT ID, user_id, name, email, g_access_token, refresh_token, expires_in FROM user WHERE user_id = :user_id LIMIT 1";
         $query = $this->db->prepare($sql);
         $parameters = array(':user_id' => $user_id);
         $query->execute($parameters);
         return $query->fetch();
+    }
+
+    public function updateToken($user_id, $g_access_token, $refresh_token, $token_type, $expires_in)
+    {
+        $sql = "UPDATE user SET g_access_token = :g_access_token, refresh_token = :refresh_token, token_type = :token_type, expires_in = :expires_in WHERE user_id = :user_id";
+        $query = $this->db->prepare($sql);
+        $parameters = array(':g_access_token' => $g_access_token, ':refresh_token' => $refresh_token, ':token_type' => $token_type, ':expires_in' => $expires_in, ':user_id' => $user_id);
+        //echo '[ PDO DEBUG ]: ' . \PdoDebugger::show($sql, $parameters); exit();
+        $query->execute($parameters);
     }
 
 }

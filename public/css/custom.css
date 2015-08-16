@@ -311,7 +311,7 @@ li.css a {
     margin-top: 10px;
 }
 
-.download-album span {
+.download-album span, .upload-album span {
     background-color: #000;
     opacity: 0.8;
     z-index: 19;
@@ -326,12 +326,12 @@ li.css a {
     color: #ffffff;
 }
 
-.download-album span:before {
+.download-album span:before, .upload-album span:before  {
     font-family: 'Glyphicons Halflings';
     content: "\e013";
 }
 
-.download-album.active span {
+.download-album.active span, .upload-album.active span {
     display: block;
 }
 
