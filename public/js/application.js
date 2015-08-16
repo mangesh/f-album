@@ -27,6 +27,7 @@ jQuery.fn.extend({
 $(function () {
     //$('#albums').hide();
     $('#download-mode-group').slideUp();
+    $('.upload-alert').hide();
     if($('#mode-group input[name="mode"]').length !== 0){
         $('#mode-group input[name="mode"]').on('change', function (e) {
             var _this = $(this);
@@ -208,10 +209,13 @@ $(function () {
 
     $('#openModal').on('shown.bs.modal', function () {
         //$carousel = $('.carousel').imagesLoaded( function() {
-        var $carousel = $('.carousel').carousel().hide();
+        var $carousel = $('.carousel').carousel({
+            interval: 3000
+        });//.hide();
+        $carousel.carousel('cycle');
         //})
         $('.carousel').imagesLoaded( function() {
-            $carousel.show();
+            //$carousel.show();
         })
         /*$('.carousel').carousel();*/
         /*$('.inner-circles-loader').show();
