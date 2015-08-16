@@ -20,18 +20,14 @@
         <div id="download-mode-group" class="btn-group btn-group-xs hide" role="group">
             <button type="button" class="btn btn-info selected-albums " disabled="disabled">Selected Albums</button>
             <button type="button" class="btn btn-info all-albums">All Albums</button>
-            <!-- <label class="btn btn-default disabled">
-                <input type="radio" id="option1"> Download:
-            </label>
-            <label class="btn btn-info active">
-                <input type="button" name="selected" value="multiple" id="option2"> Selected Albums
-            </label>
-            <label class="btn btn-info">
-                <input type="button" name="selectall" value="all" id="option3"> All Albums
-            </label> -->
         </div>
         <div class="clear"></div>
         <p class="bg-primary link-alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <strong>Download link:</strong> <a class='btn btn-primary btn-xs link' href="#">Download</a>
+        </p>
+
+        <p class="bg-primary upload-alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
             <strong>Download link:</strong> <a class='btn btn-primary btn-xs link' href="#">Download</a>
         </p>
@@ -43,13 +39,11 @@
                     <span class="d-hide">{{album.name}}</span>
                     <span></span>
                     <img class="img-circle_" alt="{{album.name}}" title="{{album.name}}" src="{{album.picture.url}}">
-                    <!-- <strong class="d-hide">{{album.name}}</strong> -->
+                    
                     <div class="download-btn">
                         <p>
                             <button type="button" class="btn btn-primary btn-xs download">Download</button>
-                            <!-- <label class="pull-right">
-                                <input type="checkbox">
-                            </label> -->
+                            
                         </p>
                     </div>
                     
@@ -58,19 +52,7 @@
             {% endfor %}
         </ul>
     </div>
-    <!-- <div id="grid" class="container">
-        <ul class="listrap">
-            {% for album in albums %}
-            <li id="{{album.id}}" class="">
-                <div class="listrap-toggle">
-                    <span></span>
-                    <img class="img-circle" alt="Album Cover" src="{{album.picture.url}}" style="width:60px;height:60px;">
-                </div>
-                <strong class="d-hide">{{album.name}}</strong>
-            </li>
-            {% endfor %}
-        </ul>
-    </div> -->
+    
     <div class="modal fade bs-example-modal-lg modal-vcenter_ modal-fullscreen force-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" id="openModal">
         <div class="modal-dialog modal-lg">
             

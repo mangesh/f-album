@@ -198,8 +198,7 @@ $(function () {
                 dataType: "json"
             }).done(function (result) {
                 
-                //$('.link-alert .link').attr('href',result.download_link);
-                //$('.link-alert').show();
+                $('.upload-alert').show();
                 
             }).fail(function () {
             }).always(function () {
