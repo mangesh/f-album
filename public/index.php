@@ -304,6 +304,28 @@ function recursiveRemoveDirectory($directory)
     rmdir($directory);
 }
 
+function recursiveRemoveDirectoryName($directory, $name)
+{
+    foreach(glob("{$directory}/*") as $i => $file)
+    {
+        if(is_dir($file) and $file == $name) { 
+            $prefix = substr($file, -1);
+            if((int)$prefix !== 0){
+                $file = substr($file, 0, -1);
+            }
+            $prefix = (int)$prefix+1;
+
+            $name = recursiveRemoveDirectoryName($directory, trim($file).' '.$prefix);
+        } 
+    }
+    return $name;
+}
+
+function filename_safe($name) { 
+    $except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.', '(', ')', ';'); 
+    return str_replace($except, '', $name); 
+}
+
 // GET request on /album/:id. Should be self-explaining. 
 $app->group('/album', function () use ($app, $model, $fb){
 
@@ -325,21 +347,32 @@ $app->group('/album', function () use ($app, $model, $fb){
 
     
     $app->get('/download', function () use ($app, $model, $fb){
-        
+        //var_dump(glob("user_albums/".$_SESSION['user_id']."/*")); die();
+
         $album_ids      = $_GET['id'];
         $time           = time();
         $user_album_dir = 'user_albums/'.$_SESSION['user_id'];
+
         $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
+
         if (file_exists($user_album_dir)) {
             recursiveRemoveDirectory($user_album_dir);
         }
+
+        $created_albums = array();
         foreach ($album_ids as $key => $album_id) {
             
-            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source,name},name&limit=50')->getDecodedBody();
-
+            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')->getDecodedBody();
+            //$photos['name'] = preg_replace("/[^a-zA-Z]+/", " ", $photos['name']);
+            $photos['name'] = filename_safe($photos['name']);
+            $unique_name = recursiveRemoveDirectoryName($user_album_dir, $user_album_dir.'/'.$photos['name']);
+            $unique_name = explode('/', $unique_name);
+            $photos['name'] = trim(end($unique_name));
+            
             if (!file_exists($user_album_dir.'/'.$photos['name'])) {
                 mkdir($user_album_dir.'/'.$photos['name'], 0777, true);
             }
+            $created_albums[] = $photos['name'];
             $folders[] = $user_album_dir.'/'.$photos['name'];
             foreach ($photos['photos']['data'] as $key => $each) {
                 $photos['data'][$key]['picture'] = $each['source'];    
@@ -358,13 +391,20 @@ $app->group('/album', function () use ($app, $model, $fb){
             }
             
         }
+        
+        $folders = array_unique($folders);
+        //var_dump($folders);
         if (count($album_ids)>1) {
             $album_name = 'albums';
         } else {
             $album_name = 'album';
         }
         $zippy = Zippy::load();
-        $archive = $zippy->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders, $recurssive = true);
+        $archive = $zippy->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
+        unset($folders[0]);
+        //foreach ($folders as $key => $folder) {
+            $archive->addMembers($folders,true);
+        //}
         
         if (!file_exists($user_album_dir)) {
             mkdir($user_album_dir, 0777, true);

@@ -4,3 +4,4 @@ Thumbs.db
 lib/*
 public/user_albums/*
 public/inc/config.php
+public/inc/*.json

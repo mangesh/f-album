@@ -97,28 +97,32 @@ $(function () {
             })
         })
         
-        $(document).on('click', '.load-album button, .selected-albums, .all-albums', function (e) {
+        $(document).on('click', '.all-albums', function (e) {
+
+            $('.download-album').removeClass("active").removeClass("selected");
+            $('.download-album').addClass("active").addClass("selected");
+            BootstrapDialog.confirm('Hi Apple, are you sure?', function(result){
+                if(result) {
+                    $('.download-album').removeClass("active").removeClass("selected");
+                    $('.download-album').addClass("active").addClass("selected");
+                    $('.selected-albums').prop('disabled', false);
+                    $('.selected-albums').trigger('click');
+                }else {
+                    $('.selected-albums').prop('disabled', false);
+                    $('.download-album').removeClass("active").removeClass("selected");
+                    return false;
+                }
+            });
+            
+        })
+        $(document).on('click', '.load-album button, .selected-albums', function (e) {
             e.preventDefault();
             
             if($(this).hasClass('download')){
                 $('.selected').removeClass('selected');
                 $(this).parents('li').addClass('selected');
             }
-            var result = false;
-            if($(this).hasClass('all-albums')){
-                $('.download-album').removeClass("active").removeClass("selected");
-                $('.download-album').addClass("active").addClass("selected");
-                /*BootstrapDialog.confirm('Hi Apple, are you sure?', function(result){
-                    if(result) {
-                        $('.download-album').removeClass("active").removeClass("selected");
-                        $('.download-album').addClass("active").addClass("selected");
-                    }else {
-                        $('.download-album').removeClass("active").removeClass("selected");
-                        return false;
-                    }
-                });*/
-            }
-            console
+            
             var array = jQuery('#albums li.selected').map(function(){
                 return 'id[]=' + this.id
             }).get();
