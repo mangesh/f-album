@@ -99,22 +99,6 @@ $fb = new Facebook\Facebook([
         'default_graph_version' => 'v2.2',
     ]);
 
-/************************************ Google Login API ********************************************************/
-
-/*$client = new Google_Client();
-$client->setAuthConfigFile('inc/client_secrets.json');
-$client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
-
-if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-  $client->setAccessToken($_SESSION['access_token']);
-  $drive_service = new Google_Service_Drive($client);
-  $files_list = $drive_service->files->listFiles(array())->getItems();
-  echo json_encode($files_list);
-} else {
-  $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/oauth2callback.php';
-  header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
-}*/
-
 /************************************ THE ROUTES / CONTROLLERS *************************************************/
 
 // GET request on homepage, simply show the view template index.twig
@@ -356,7 +340,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
         $_SESSION['user_id']    = $user["id"];
         $_SESSION['user_name']  = $user["name"];
         $is_user_exists = $model->getUser($user["id"]);
-        //var_dump($is_user_exists); die();
+        
         if (!$is_user_exists) {
             $model->addUser(
                 $user["id"],
@@ -364,6 +348,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
                 $user["email"]
             );
         } else {
+            //print_r($is_user_exists); echo time(); die();
             $is_user_exists = (array)$is_user_exists;
             if(isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> ''){
                 if ($is_user_exists['expires_in'] < time()) {
@@ -382,6 +367,10 @@ $app->get('/callback', function () use ($app, $model, $fb) {
                             $_SESSION['expires_in']
                         );
                     }
+                } else {
+                    $_SESSION['g_access_token']     = $is_user_exists["g_access_token"];
+                    $_SESSION['refresh_token']      = $is_user_exists['refresh_token'];
+                    $_SESSION['expires_in']         = $is_user_exists["expires_in"];
                 }
             }
         }

@@ -40,6 +40,7 @@ $(function () {
                 $('.selected-picasa-albums').addClass('selected-albums').attr('disabled',true).removeClass('selected-picasa-albums');
                 $('p.name').addClass('hide');
                 $('p.button').removeClass('hide');
+                $('.group-label').html('Download');
             } else if (_this.val() == 'upload'){
                 $('.load-album button,.download-album button').attr('disabled',false).addClass('upload').removeClass('download').html('Upload');
                 $('.download-album').removeClass('active selected');
@@ -48,7 +49,8 @@ $(function () {
                 $('#download-mode-group').removeClass('hide');
                 $('.selected-albums').addClass('selected-picasa-albums').attr('disabled',true).removeClass('selected-albums');
                 $('p.name').addClass('hide');
-                $('p.button').removeClass('hide')
+                $('p.button').removeClass('hide');
+                $('.group-label').html('Upload');
             } else {
                 $('.album').removeClass('download-album upload-album').addClass('load-album');
                 $('#download-mode-group').button('reset');
@@ -89,7 +91,6 @@ $(function () {
         var _this = $(this).parents('li');
         
         if( e.target == this ){
-            console.log(_this);
             _this.toggleClass("active").toggleClass("selected");
             var selection = new Array();
             $(".upload-album.selected").each(function (ix, el) {
@@ -144,31 +145,40 @@ $(function () {
         
         $(document).on('click', '.all-albums', function (e) {
 
-            BootstrapDialog.confirm('Are you sure?', function(result){
-                if(result) {
-                    if($('.download-album').length > 0){
-                        $('.download-album').removeClass("active").removeClass("selected");
-                        $('.download-album').addClass("active").addClass("selected");
-                        $('.selected-albums').prop('disabled', false);
-                        $('.selected-albums').trigger('click');
-                    } else {
-                        $('.upload-album').removeClass("active").removeClass("selected");
-                        $('.upload-album').addClass("active").addClass("selected");
-                        $('.selected-picasa-albums').prop('disabled', false);
-                        $('.selected-picasa-albums').trigger('click');
+            BootstrapDialog.confirm({
+                title: 'Are you sure?',
+                message: 'Downloading all the items may take some time!',
+                type: BootstrapDialog.TYPE_WARNING,
+                closable: true,
+                draggable: true,
+                btnCancelLabel: 'Cancel!',
+                btnOKLabel: 'D0 it!',
+                btnOKClass: 'btn-warning',
+                callback: function(result) {
+                    if(result) {
+                        if($('.download-album').length > 0){
+                            $('.download-album').removeClass("active").removeClass("selected");
+                            $('.download-album').addClass("active").addClass("selected");
+                            $('.selected-albums').prop('disabled', false);
+                            $('.selected-albums').trigger('click');
+                        } else {
+                            $('.upload-album').removeClass("active").removeClass("selected");
+                            $('.upload-album').addClass("active").addClass("selected");
+                            $('.selected-picasa-albums').prop('disabled', false);
+                            $('.selected-picasa-albums').trigger('click');
+                        }
+                    }else {
+                        if($('.download-album').length > 0){
+                            $('.selected-albums').prop('disabled', false);
+                            $('.download-album').removeClass("active").removeClass("selected");
+                        } else {
+                            $('.selected-picasa-albums').prop('disabled', false);
+                            $('.upload-album').removeClass("active").removeClass("selected");
+                        }
+                        return false;
                     }
-                }else {
-                    if($('.download-album').length > 0){
-                        $('.selected-albums').prop('disabled', false);
-                        $('.download-album').removeClass("active").removeClass("selected");
-                    } else {
-                        $('.selected-picasa-albums').prop('disabled', false);
-                        $('.upload-album').removeClass("active").removeClass("selected");
-                    }
-                    return false;
                 }
-            });
-            
+            })
         })
 
         $(document).on('click', 'button.download, .selected-albums', function (e) {
@@ -183,7 +193,6 @@ $(function () {
             };
             
             $.loader.open($data);
-
 
             if($(this).hasClass('download')){
                 $('.selected').removeClass('selected');
@@ -204,6 +213,7 @@ $(function () {
                 $('.selected-albums').attr('disabled',true);
                 $('.link-alert .link').attr('href',result.download_link);
                 $('.link-alert').show();
+                $('button.download').attr('disabled', false);
                 $.loader.close(true);
                 
             }).fail(function () {
@@ -220,12 +230,11 @@ $(function () {
             e.preventDefault();
             
             $data = {
-                autoCheck: 32,
                 size: 32,
-                bgColor: "#000",
+                bgColor: "#fff",
                 bgOpacity: 0.6,
-                fontColor: "#fff",
-                title: 'Wait',
+                fontColor: "#000",
+                title: '',
             };
             
             $.loader.open($data);

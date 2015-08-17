@@ -160,7 +160,8 @@ li.css a {
 }
 
 .modal-content {
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0,0,0,0.9);
+    text-shadow: none !important;
 }
 
 .bootstrap-dialog .modal-content {
@@ -383,4 +384,8 @@ li.css a {
 .loading_wrp .x32 img {
   width: 32px;
   height: 32px;
+}
+
+.default_pointer {
+  cursor: default !important;
 }
