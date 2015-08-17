@@ -32,58 +32,76 @@ $(function () {
         $('#mode-group input[name="mode"]').on('change', function (e) {
             var _this = $(this);
             if (_this.val() == 'download') {
-                $('.load-album button,.upload-album button').removeClass('upload').addClass('download').html('Download');
+                $('.load-album button,.upload-album button').attr('disabled',false).removeClass('upload').addClass('download').html('Download');
+                $('.upload-album').removeClass('active selected');
                 $('.album').removeClass('load-album upload-album').addClass('download-album');
                 $('.selected').removeClass('selected');
                 $('#download-mode-group').removeClass('hide');
-                $('.selected-picasa-albums').addClass('selected-albums').removeClass('selected-picasa-albums');
+                $('.selected-picasa-albums').addClass('selected-albums').attr('disabled',true).removeClass('selected-picasa-albums');
+                $('p.name').addClass('hide');
+                $('p.button').removeClass('hide');
             } else if (_this.val() == 'upload'){
-                $('.load-album button,.download-album button').addClass('upload').removeClass('download').html('Upload');
+                $('.load-album button,.download-album button').attr('disabled',false).addClass('upload').removeClass('download').html('Upload');
+                $('.download-album').removeClass('active selected');
                 $('.album').removeClass('load-album download-album').addClass('upload-album');
                 $('.selected').removeClass('selected');
                 $('#download-mode-group').removeClass('hide');
-                $('.selected-albums').addClass('selected-picasa-albums').removeClass('selected-albums');
+                $('.selected-albums').addClass('selected-picasa-albums').attr('disabled',true).removeClass('selected-albums');
+                $('p.name').addClass('hide');
+                $('p.button').removeClass('hide')
             } else {
                 $('.album').removeClass('download-album upload-album').addClass('load-album');
                 $('#download-mode-group').button('reset');
                 $('#download-mode-group').addClass('hide');
-                $('.download-album button,.upload-album button').removeClass('download upload');
+                $('.download-album button,.upload-album button').attr('disabled',false).removeClass('download upload');
                 $('.selected-picasa-albums,.selected-albums').addClass('selected-picasa-albums selected-albums');
+                $('.download-album, .upload-album').removeClass('active selected');
+                $('p.button').addClass('hide');
+                $('p.name').removeClass('hide')
             }
+            $('#albums').masonry();
         })
     }
 
-    $(document).on('click', '.download-album', function (e) {
+    $(document).on('click', '.download-album img', function (e) {
         e.preventDefault();
-        var _this = $(this);
-        _this.toggleClass("active").toggleClass("selected");
-        var selection = new Array();
-        $(".download-album.selected").each(function (ix, el) {
-            selection.push($(el)[0]);
-        });
-        if ( selection.length > 0 ) {
-            $('.download').prop('disabled', true);
-            $('.selected-albums').prop('disabled', false);
-        } else {
-            $('.download').prop('disabled', false);
-            $('.selected-albums').prop('disabled', true);
+        var _this = $(this).parents('li');
+
+        if( e.target == this ){
+            console.log(_this);
+            _this.toggleClass("active").toggleClass("selected");
+            var selection = new Array();
+            $(".download-album.selected").each(function (ix, el) {
+                selection.push($(el)[0]);
+            });
+            if ( selection.length > 0 ) {
+                $('.download').prop('disabled', true);
+                $('.selected-albums').prop('disabled', false);
+            } else {
+                $('.download').prop('disabled', false);
+                $('.selected-albums').prop('disabled', true);
+            }
         }
     })
 
-    $(document).on('click', '.upload-album', function (e) {
+    $(document).on('click', '.upload-album img', function (e) {
         e.preventDefault();
-        var _this = $(this);
-        _this.toggleClass("active").toggleClass("selected");
-        var selection = new Array();
-        $(".upload-album.selected").each(function (ix, el) {
-            selection.push($(el)[0]);
-        });
-        if ( selection.length > 0 ) {
-            $('.upload').prop('disabled', true);
-            $('.selected-picasa-albums').prop('disabled', false);
-        } else {
-            $('.upload').prop('disabled', false);
-            $('.selected-picasa-albums').prop('disabled', true);
+        var _this = $(this).parents('li');
+        
+        if( e.target == this ){
+            console.log(_this);
+            _this.toggleClass("active").toggleClass("selected");
+            var selection = new Array();
+            $(".upload-album.selected").each(function (ix, el) {
+                selection.push($(el)[0]);
+            });
+            if ( selection.length > 0 ) {
+                $('.upload').prop('disabled', true);
+                $('.selected-picasa-albums').prop('disabled', false);
+            } else {
+                $('.upload').prop('disabled', false);
+                $('.selected-picasa-albums').prop('disabled', true);
+            }
         }
     })
 
@@ -111,7 +129,7 @@ $(function () {
                 })
                 $('.carousel-inner div').eq(0).addClass('active');
                 
-                //$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+                $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
                 //$('.carousel').imagesLoaded( function() {
                     //console.log('images loaded');
                     $('#openModal').modal({show:true});
@@ -156,6 +174,17 @@ $(function () {
         $(document).on('click', 'button.download, .selected-albums', function (e) {
             e.preventDefault();
             
+            $data = {
+                size: 32,
+                bgColor: "#fff",
+                bgOpacity: 0.6,
+                fontColor: "#000",
+                title: '',
+            };
+            
+            $.loader.open($data);
+
+
             if($(this).hasClass('download')){
                 $('.selected').removeClass('selected');
                 $(this).parents('li').addClass('selected');
@@ -171,18 +200,36 @@ $(function () {
                 data: array.join('&'),
                 dataType: "json"
             }).done(function (result) {
-                
+                $('li.album').removeClass('active selected');
+                $('.selected-albums').attr('disabled',true);
                 $('.link-alert .link').attr('href',result.download_link);
                 $('.link-alert').show();
+                $.loader.close(true);
                 
             }).fail(function () {
             }).always(function () {
             })
         })
 
+        $(document).on('click', 'p .close', function (e) {
+            e.preventDefault();
+            $(this).parents('p').hide();
+        })
+
         $(document).on('click', 'button.upload, .selected-picasa-albums', function (e) {
             e.preventDefault();
             
+            $data = {
+                autoCheck: 32,
+                size: 32,
+                bgColor: "#000",
+                bgOpacity: 0.6,
+                fontColor: "#fff",
+                title: 'Wait',
+            };
+            
+            $.loader.open($data);
+
             if($(this).hasClass('upload')){
                 $('.selected').removeClass('selected');
                 $(this).parents('li').addClass('selected');
@@ -199,8 +246,15 @@ $(function () {
                 dataType: "json"
             }).done(function (result) {
                 
-                $('.upload-alert').show();
-                
+                if (result.status == 'need_google_login') {
+                    $.loader.close(true);
+                    authorize();
+                } else {
+                    $('li.album').removeClass('active selected');
+                    $('.selected-picasa-albums').attr('disabled',true);
+                    $('.upload-alert').show();
+                }
+                $.loader.close(true);
             }).fail(function () {
             }).always(function () {
             })
@@ -214,9 +268,7 @@ $(function () {
         });//.hide();
         $carousel.carousel('cycle');
         //})
-        $('.carousel').imagesLoaded( function() {
-            //$carousel.show();
-        })
+        
         /*$('.carousel').carousel();*/
         /*$('.inner-circles-loader').show();
         var carousel = $(this).find('.carousel').hide();
@@ -248,90 +300,41 @@ $(function () {
     });
 
     var gutter = parseInt(jQuery('.album').css('marginBottom'));
+    if($('#albums').length > 0){
+        var $grid = $('#albums').masonry({
+            percentPosition: true,
+            gutter: gutter,
+            itemSelector: '.album',
+            columnWidth: '.album',
+            //isAnimated: !Modernizr.csstransitions,
+            isFitWidth: true
+        });
+        // layout Isotope after each image loads
+        $grid.imagesLoaded().progress( function() {
+            $grid.masonry();
+        });
+    }
     
-    var $grid = $('#albums').masonry({
-        percentPosition: true,
-        gutter: gutter,
-        itemSelector: '.album',
-        columnWidth: '.album',
-        //isAnimated: !Modernizr.csstransitions,
-        isFitWidth: true
-    });
-    // layout Isotope after each image loads
-    $grid.imagesLoaded().progress( function() {
-        $grid.masonry();
-    });
-
-    /*jQuery(window).bind('resize', function () {
-        //if (!jQuery('#albums').parent().hasClass('container')) {
-            // Resets all widths to 'auto' to sterilize calculations
-            post_width = jQuery('.album').width() + gutter;
-            //console.log(gutter);
-            jQuery('#albums, body > #grid').css('width', 'auto');
-            // Calculates how many .album elements will actually fit per row. Could this code be cleaner?
-            posts_per_row = jQuery('#albums').innerWidth() / post_width;
-            floor_posts_width = (Math.floor(posts_per_row) * post_width) - gutter;
-            ceil_posts_width = (Math.ceil(posts_per_row) * post_width) - gutter;
-            posts_width = (ceil_posts_width > jQuery('#albums').innerWidth()) ? floor_posts_width : ceil_posts_width;
-            if (posts_width == jQuery('.album').width()) {
-                posts_width = '100%';
-            }// Ensures that all top-level elements have equal width and stay centered
-            jQuery('#albums, #grid').css('width', posts_width);
-            jQuery('#grid').css({'margin': '0 auto'});
-         //}
-    }).trigger('resize');*/
     
 })
 
-// Load is used to ensure all images have been loaded, impossible with document
-jQuery(window).load(function () {
-    //$('#albums').show();
-    // Takes the gutter width from the bottom margin of .album
-    /*var gutter = parseInt(jQuery('.album').css('marginBottom'));
-    var container = jQuery('#albums');
-    // Creates an instance of Masonry on #albums
-    container.masonry({
-        gutter: gutter,
-        itemSelector: '.album',
-        columnWidth: '.album'
-    });
-    // This code fires every time a user resizes the screen and only affects .album elements
-    // whose parent class isn't .container. Triggers resize first so nothing looks weird.
-    jQuery(window).bind('resize', function () {
-        if (!jQuery('#albums').parent().hasClass('container')) {
-            // Resets all widths to 'auto' to sterilize calculations
-            post_width = jQuery('.album').width() + gutter;
-            console.log(gutter);
-            jQuery('#albums, body > #grid').css('width', 'auto');
-            // Calculates how many .album elements will actually fit per row. Could this code be cleaner?
-            posts_per_row = jQuery('#albums').innerWidth() / post_width;
-            floor_posts_width = (Math.floor(posts_per_row) * post_width) - gutter;
-            ceil_posts_width = (Math.ceil(posts_per_row) * post_width) - gutter;
-            posts_width = (ceil_posts_width > jQuery('#albums').innerWidth()) ? floor_posts_width : ceil_posts_width;
-            if (posts_width == jQuery('.album').width()) {
-                posts_width = '100%';
-            }// Ensures that all top-level elements have equal width and stay centered
-            jQuery('#albums, #grid').css('width', posts_width);
-            jQuery('#grid').css({'margin': '0 auto'});
-        }
-    }).trigger('resize');*/
-});
 
 function authorize()
 {
-  var oauthWindow = window.open("https://accounts.google.com/o/oauth2/auth?scope=https://picasaweb.google.com/data/&response_type=code&access_type=offline&redirect_uri=http://fb.dev/google_callback&approval_prompt=force&client_id=548862589391-v5so882uie6k657ehpptta1p665uvscu.apps.googleusercontent.com","_blank","width=700,height=400");
-  if(!oauthWindow || oauthWindow.closed || typeof oauthWindow.closed=='undefined')
-  {
-    // popup blocked, for example on ios you can't programatically
-    // launch a popup from a tab that was a programatically launched popup
-    alert('Failed');      
-  }
-  // else flow is now in the popup
-  // we have designed it to trigger our oauthComplete when finished
-  // we will remain idle until then
+    var oauthWindow = window.open("https://accounts.google.com/o/oauth2/auth?scope=https://picasaweb.google.com/data/&response_type=code&access_type=offline&redirect_uri=http://fb.dev/google_callback&approval_prompt=force&client_id=548862589391-v5so882uie6k657ehpptta1p665uvscu.apps.googleusercontent.com","_blank","width=700,height=400");
+    if(!oauthWindow || oauthWindow.closed || typeof oauthWindow.closed=='undefined')
+    {
+        // popup blocked, for example on ios you can't programatically
+        // launch a popup from a tab that was a programatically launched popup
+        alert('Please unblock popup window to login with google account');      
+    }
+    // else flow is now in the popup
+    // we have designed it to trigger our oauthComplete when finished
+    // we will remain idle until then
 }
 
-function oauthComplete()
+function oauth_complete()
 {
-  console.log('auth complete');
+    console.log('auth complete');
+    $('.selected-picasa-albums').attr('disabled',false).trigger('click');
 }

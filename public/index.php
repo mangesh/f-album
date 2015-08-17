@@ -1,20 +1,10 @@
 <?php
-
 /******************************* LOADING & INITIALIZING BASE APPLICATION ****************************************/
-
 // Configuration for error reporting, useful to show every little problem during development
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 set_time_limit(0);
 session_start();
-
-if (!extension_loaded('openssl')) {
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        dl('php_openssl.dll');
-    } else {
-        dl('openssl.so');
-    }
-}
 
 // Load Composer's PSR-4 autoloader (necessary to load Slim, Mini etc.)
 require '../lib/vendor/autoload.php';
@@ -147,9 +137,10 @@ $app->get('/', function () use ($app, $fb) {
 
 });
 
-function update_token($google_cred, $refresh_token){
+function update_token($google_cred, $refresh_token)
+{
     $clientId       = $google_cred['client_id'];
-    $clientSecret   = $google_cred['client_secret']; 
+    $clientSecret   = $google_cred['client_secret'];
     $referer        = 'http://fb.dev/home';
 
     $postBody = 'refresh_token='.urlencode($refresh_token)
@@ -165,7 +156,7 @@ function update_token($google_cred, $refresh_token){
                                                      , 'Content-Length: '.strlen($postBody)
                                                      , 'User-Agent: YourApp/0.1 +http://fb.dev/home'
                                                      )
-                       , CURLOPT_POSTFIELDS => $postBody                              
+                       , CURLOPT_POSTFIELDS => $postBody                         
                        , CURLOPT_REFERER => $referer
                        , CURLOPT_RETURNTRANSFER => 1 // means output will be a return value from curl_exec() instead of simply echoed
                        , CURLOPT_TIMEOUT => 120 // max seconds to wait
@@ -173,8 +164,7 @@ function update_token($google_cred, $refresh_token){
                        , CURLOPT_FAILONERROR => 0 // do not fail verbosely fi the http_code is an error, this is for security
                        , CURLOPT_SSL_VERIFYPEER => 0 // do verify the SSL of CURLOPT_URL, this is for security
                        , CURLOPT_VERBOSE => 0 // don't output verbosely to stderr, this is for security
-                )
-            );
+                ));
     $response = curl_exec($curl);
     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     $response = (array)json_decode($response);
@@ -274,7 +264,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
                 <script type="text/javascript">
                     function closeThis()
                     {
-                        window.opener.oauthComplete(); 
+                        window.opener.oauth_complete(); 
                         window.close();
                     }
                 </script>
@@ -361,12 +351,12 @@ $app->get('/callback', function () use ($app, $model, $fb) {
     }
 
     $user = $response->getGraphUser();
-    
+    //var_dump($user); die();
     if (isset($user)) {
         $_SESSION['user_id']    = $user["id"];
         $_SESSION['user_name']  = $user["name"];
-        $is_user_exists = (array)$model->getUser($user["id"]);
-
+        $is_user_exists = $model->getUser($user["id"]);
+        //var_dump($is_user_exists); die();
         if (!$is_user_exists) {
             $model->addUser(
                 $user["id"],
@@ -374,7 +364,8 @@ $app->get('/callback', function () use ($app, $model, $fb) {
                 $user["email"]
             );
         } else {
-            if($is_user_exists['g_access_token'] <> ''){
+            $is_user_exists = (array)$is_user_exists;
+            if(isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> ''){
                 if ($is_user_exists['expires_in'] < time()) {
                     $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
                     if($refresh){
@@ -430,10 +421,11 @@ $app->get('/home', function () use ($app, $model, $fb) {
     /* User profile picture */
     $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
 
-    $is_user_exists = (array)$model->getUser($_SESSION['user_id']);
+    $is_user_exists = $model->getUser($_SESSION['user_id']);
     
     if ($is_user_exists) {
-        if($is_user_exists['g_access_token'] <> ''){
+        $is_user_exists = (array)$is_user_exists;
+        if(isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> ''){
             if ($is_user_exists['expires_in'] < time()) {
                 $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
                 if($refresh){
@@ -445,7 +437,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
                     $model->updateToken(
                         $_SESSION['user_id'],
                         $response["access_token"],
-                        $refresh_token,
+                        $is_user_exists['refresh_token'],
                         $response["token_type"],
                         $_SESSION['expires_in']
                     );
@@ -501,12 +493,12 @@ $app->get('/sign-out', function () use ($app) {
     exit;
 });
 
-function recursiveRemoveDirectory($directory)
+function recursive_remove_directory($directory)
 {
     foreach(glob("{$directory}/*") as $file)
     {
         if(is_dir($file)) { 
-            recursiveRemoveDirectory($file);
+            recursive_remove_directory($file);
         } else {
             unlink($file);
         }
@@ -514,7 +506,7 @@ function recursiveRemoveDirectory($directory)
     rmdir($directory);
 }
 
-function recursiveCheckDirectoryName($directory, $name)
+function recursive_check_directory_name($directory, $name)
 {
     foreach(glob("{$directory}/*") as $i => $file)
     {
@@ -525,18 +517,20 @@ function recursiveCheckDirectoryName($directory, $name)
             }
             $prefix = (int)$prefix+1;
 
-            $name = recursiveCheckDirectoryName($directory, trim($file).' '.$prefix);
+            $name = recursive_check_directory_name($directory, trim($file).' '.$prefix);
         } 
     }
     return $name;
 }
 
-function filename_safe($name) { 
+function filename_safe($name)
+{ 
     $except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.', '(', ')', ';'); 
     return str_replace($except, '', $name); 
 }
 
-function create_album($album_name = ''){
+function create_album($album_name = '')
+{
     if ($album_name == '') {
         return false;
     }
@@ -581,7 +575,9 @@ function create_album($album_name = ''){
     $album      = simplexml_load_string($response);
     return $album;
 }
-function upload_photos_to_picasa($album_id = '', $photos_dir = ''){
+
+function upload_photos_to_picasa($album_id = '', $photos_dir = '')
+{
     if ($album_id == '') {
         return false;
     }
@@ -591,7 +587,7 @@ function upload_photos_to_picasa($album_id = '', $photos_dir = ''){
     foreach(glob("{$photos_dir}/*") as $file)
     {
         if(!is_dir($file)) { 
-            echo $albumUrl = $album_id;
+            $albumUrl = $album_id;
             $imgName = $_SERVER['DOCUMENT_ROOT'].'/'.$file;
 
             /*$rawImgXml = '<entry xmlns="http://www.w3.org/2005/Atom">
@@ -688,7 +684,7 @@ $app->group('/album', function () use ($app, $model, $fb){
         $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
 
         if (file_exists($user_album_dir)) {
-            recursiveRemoveDirectory($user_album_dir);
+            recursive_remove_directory($user_album_dir);
         }
 
         $created_albums = array();
@@ -696,7 +692,7 @@ $app->group('/album', function () use ($app, $model, $fb){
             
             $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')->getDecodedBody();
             $photos['name'] = filename_safe($photos['name']);
-            $unique_name = recursiveCheckDirectoryName($user_album_dir, $user_album_dir.'/'.$photos['name']);
+            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
             $unique_name = explode('/', $unique_name);
             $photos['name'] = trim(end($unique_name));
             
@@ -748,7 +744,7 @@ $app->group('/album', function () use ($app, $model, $fb){
         //chdir('..');
         /* Archive is generate. Delete the folders/albums from server*/
         foreach ($folders as $key => $folder) {
-            recursiveRemoveDirectory($folder);
+            recursive_remove_directory($folder);
         }
         /*chdir('user_albums');
         chmod($time.$_SESSION['user_id'].'_'.$album_name.'.zip', 0777);
@@ -762,6 +758,17 @@ $app->group('/album', function () use ($app, $model, $fb){
 
     $app->get('/upload', function () use ($app, $model, $fb){
 
+        $is_user_exists = $model->getUser($_SESSION['user_id']);
+    
+        if ($is_user_exists) {
+            $is_user_exists = (array)$is_user_exists;
+            if($is_user_exists['g_access_token'] == ''){
+                $app->contentType('application/json;charset=utf-8');
+                echo json_encode(array('status' => 'need_google_login'));
+                exit();
+            }
+        }
+
         $album_ids      = $_GET['id'];
         $time           = time();
         $user_album_dir = 'user_albums/'.$_SESSION['user_id'];
@@ -769,15 +776,16 @@ $app->group('/album', function () use ($app, $model, $fb){
         $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
 
         if (file_exists($user_album_dir)) {
-            recursiveRemoveDirectory($user_album_dir);
+            recursive_remove_directory($user_album_dir);
         }
 
         $created_albums = array();
         foreach ($album_ids as $key => $album_id) {
             
-            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')->getDecodedBody();
+            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
+                ->getDecodedBody();
             $photos['name'] = filename_safe($photos['name']);
-            $unique_name = recursiveCheckDirectoryName($user_album_dir, $user_album_dir.'/'.$photos['name']);
+            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
             $unique_name = explode('/', $unique_name);
             $photos['name'] = trim(end($unique_name));
             
@@ -816,7 +824,7 @@ $app->group('/album', function () use ($app, $model, $fb){
        
         /* Photos are uploaded. Delete the folders/albums from server*/
         foreach ($folders as $key => $folder) {
-            recursiveRemoveDirectory($folder);
+            recursive_remove_directory($folder);
         }
         
         $app->contentType('application/json;charset=utf-8');

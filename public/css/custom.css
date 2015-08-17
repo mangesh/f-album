@@ -162,6 +162,13 @@ li.css a {
 .modal-content {
     background-color: rgba(0,0,0,0.8);
 }
+
+.bootstrap-dialog .modal-content {
+    background-color: rgba(255,255,255,0.8) !important;
+    color: #000 !important;
+    text-align: left !important;
+}
+
 .carousel.carousel-fit {
   position: relative;
   /* When sliding, use the maximum height we have */
@@ -335,8 +342,45 @@ li.css a {
     display: block;
 }
 
-.link-alert {
+.link-alert, .upload-alert {
     margin-top: 10px;
     padding: 15px;
     display: none;
+}
+
+/****** loading css ******/
+
+.loading { margin: auto; }
+
+.loading span {
+  line-height: 32px;
+  margin-left: 12px;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.loading img { vertical-align: middle; }
+
+.loading_wrp {
+  background-color: #FFF;
+  display: block;
+  height: 100%;
+  left: 0;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 1020;
+}
+
+.loading_wrp .x16 span {
+  line-height: 16px;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.loading_wrp .x32 img {
+  width: 32px;
+  height: 32px;
 }

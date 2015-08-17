@@ -36,14 +36,16 @@
             {% for album in albums %}
             <li id="{{album.id}}" class="album load-album">
                 <div class="">
-                    <span class="d-hide">{{album.name}}</span>
+                    <!-- <span class="d-hide">{{album.name}}</span> -->
                     <span></span>
                     <img class="img-circle_" alt="{{album.name}}" title="{{album.name}}" src="{{album.picture.url}}">
                     
                     <div class="download-btn">
-                        <p>
+                        <p class="button hide">
                             <button type="button" class="btn btn-primary btn-xs download">Download</button>
-                            
+                        </p>
+                        <p class="name">
+                            {{album.name}}
                         </p>
                     </div>
                     
