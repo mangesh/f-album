@@ -24,10 +24,10 @@ $app->view->setTemplatesDirectory("../Mini/view");
 /******************************************* THE CONFIGS *******************************************************/
 
 // Configs for mode "development" (Slim's default), see the GitHub readme for details on setting the environment
-$app->configureMode('development', function () use ($app) {
+$app->configureMode('development', function() use ($app) {
 
     // pre-application hook, performs stuff before real action happens @see http://docs.slimframework.com/#Hooks
-    $app->hook('slim.before', function () use ($app) {
+    $app->hook('slim.before', function() use ($app) {
 
         // SASS-to-CSS compiler @see https://github.com/panique/php-sass
         //SassCompiler::run("scss/", "css/");
@@ -72,7 +72,7 @@ $app->configureMode('development', function () use ($app) {
 });
 
 // Configs for mode "production"
-$app->configureMode('production', function () use ($app) {
+$app->configureMode('production', function() use ($app) {
     // Set the configs for production environment
     $app->config(array(
         'debug' => false,
@@ -103,7 +103,7 @@ $fb = new Facebook\Facebook([
 /************************************ THE ROUTES / CONTROLLERS *************************************************/
 
 // GET request on homepage, simply show the view template index.twig
-$app->get('/', function () use ($app, $fb) {
+$app->get('/', function() use ($app, $fb) {
     $fb_cred = $app->config('fb');
 
     /* If access tokens are not available redirect to connect page. */
@@ -123,7 +123,7 @@ $app->get('/', function () use ($app, $fb) {
 });
 
 // Process the google callback request
-$app->get('/google_callback', function () use ($app, $model, $fb) {
+$app->get('/google_callback', function() use ($app, $model, $fb) {
     $google_cred = $app->config('google');
     
     if (empty($_SESSION['fb_access_token'])) {
@@ -145,9 +145,9 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
         $curl = curl_init();
         curl_setopt_array(
             $curl,
-            array( CURLOPT_CUSTOMREQUEST => 'POST'
+            array(CURLOPT_CUSTOMREQUEST => 'POST'
                , CURLOPT_URL => 'https://accounts.google.com/o/oauth2/token'
-               , CURLOPT_HTTPHEADER => array( 'Content-Type: application/x-www-form-urlencoded'
+               , CURLOPT_HTTPHEADER => array('Content-Type: application/x-www-form-urlencoded'
                                              , 'Content-Length: '.strlen($postBody)
                                              , 'User-Agent: f-album/0.1 +'.$referer
                                              )
@@ -184,7 +184,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
     }
 });
 
-$app->get('/callback', function () use ($app, $model, $fb) {
+$app->get('/callback', function() use ($app, $model, $fb) {
     $fb_cred = $app->config('fb');
     $google_cred = $app->config('google');
     
@@ -194,21 +194,21 @@ $app->get('/callback', function () use ($app, $model, $fb) {
         $accessToken = $helper->getAccessToken();
     } catch (Facebook\Exceptions\FacebookResponseException $e) {
         // When Graph returns an error
-        echo 'Graph returned an error: ' . $e->getMessage();
+        echo 'Graph returned an error: '.$e->getMessage();
         exit;
     } catch (Facebook\Exceptions\FacebookSDKException $e) {
         // When validation fails or other local issues
-        echo 'Facebook SDK returned an error: ' . $e->getMessage();
+        echo 'Facebook SDK returned an error: '.$e->getMessage();
         exit;
     }
 
-    if (! isset($accessToken)) {
+    if (!isset($accessToken)) {
         if ($helper->getError()) {
             header('HTTP/1.0 401 Unauthorized');
-            echo "Error: " . $helper->getError() . "\n";
-            echo "Error Code: " . $helper->getErrorCode() . "\n";
-            echo "Error Reason: " . $helper->getErrorReason() . "\n";
-            echo "Error Description: " . $helper->getErrorDescription() . "\n";
+            echo "Error: ".$helper->getError()."\n";
+            echo "Error Code: ".$helper->getErrorCode()."\n";
+            echo "Error Reason: ".$helper->getErrorReason()."\n";
+            echo "Error Description: ".$helper->getErrorDescription()."\n";
         } else {
             header('HTTP/1.0 400 Bad Request');
             echo 'Bad request';
@@ -230,12 +230,12 @@ $app->get('/callback', function () use ($app, $model, $fb) {
     //$tokenMetadata->validateUserId('123');
     $tokenMetadata->validateExpiration();
 
-    if (! $accessToken->isLongLived()) {
+    if (!$accessToken->isLongLived()) {
         // Exchanges a short-lived access token for a long-lived one
         try {
             $accessToken = $oAuth2Client->getLongLivedAccessToken($accessToken);
         } catch (Facebook\Exceptions\FacebookSDKException $e) {
-            echo "<p>Error getting long-lived access token: " . $helper->getMessage() . "</p>\n\n";
+            echo "<p>Error getting long-lived access token: ".$helper->getMessage()."</p>\n\n";
             exit;
         }
 
@@ -243,16 +243,16 @@ $app->get('/callback', function () use ($app, $model, $fb) {
         //var_dump($accessToken->getValue());
     }
 
-    $_SESSION['fb_access_token'] = (string) $accessToken;
+    $_SESSION['fb_access_token'] = (string)$accessToken;
 
     try {
         // Returns a `Facebook\FacebookResponse` object
         $response = $fb->get('/me?fields=id,name,email', $_SESSION['fb_access_token']);
     } catch (Facebook\Exceptions\FacebookResponseException $e) {
-        echo 'Graph returned an error: ' . $e->getMessage();
+        echo 'Graph returned an error: '.$e->getMessage();
         exit;
     } catch (Facebook\Exceptions\FacebookSDKException $e) {
-        echo 'Facebook SDK returned an error: ' . $e->getMessage();
+        echo 'Facebook SDK returned an error: '.$e->getMessage();
         exit;
     }
 
@@ -301,7 +301,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
     
 });
 
-$app->get('/home', function () use ($app, $model, $fb) {
+$app->get('/home', function() use ($app, $model, $fb) {
     
     $fb_cred = $app->config('fb');
     $google_cred = $app->config('google');
@@ -321,16 +321,16 @@ $app->get('/home', function () use ($app, $model, $fb) {
         //$response = $fb->getClient()->sendRequest($request);
     } catch (Facebook\Exceptions\FacebookResponseException $e) {
         // When Graph returns an error
-        echo 'Graph returned an error: ' . $e->getMessage();
+        echo 'Graph returned an error: '.$e->getMessage();
         exit;
     } catch (Facebook\Exceptions\FacebookSDKException $e) {
         // When validation fails or other local issues
-        echo 'Facebook SDK returned an error: ' . $e->getMessage();
+        echo 'Facebook SDK returned an error: '.$e->getMessage();
         exit;
     }
 
     /* User profile picture */
-    $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
+    $img = "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
 
     $is_user_exists = $model->getUser($_SESSION['user_id']);
     
@@ -379,7 +379,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
 });
 
 // This is nothing but a logout page
-$app->get('/clearsession', function () use ($app) {
+$app->get('/clearsession', function() use ($app) {
     /* Load and clear sessions */
     session_destroy();
      
@@ -389,7 +389,7 @@ $app->get('/clearsession', function () use ($app) {
 });
 
 // This is nothing but a logout page
-$app->get('/sign-out', function () use ($app) {
+$app->get('/sign-out', function() use ($app) {
     /* Load and clear sessions */
     session_destroy();
      
@@ -399,9 +399,9 @@ $app->get('/sign-out', function () use ($app) {
 });
 
 // GET request on /album/:id. Should be self-explaining. 
-$app->group('/album', function () use ($app, $model, $fb) {
+$app->group('/album', function() use ($app, $model, $fb) {
 
-    $app->get('/', function () use ($app, $model, $fb) {
+    $app->get('/', function() use ($app, $model, $fb) {
 
         $album_id = $_GET['id'];
     
@@ -418,7 +418,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
     });
 
     
-    $app->get('/download', function () use ($app, $model, $fb) {
+    $app->get('/download', function() use ($app, $model, $fb) {
 
         $album_ids      = $_GET['id'];
         $time           = time();
@@ -444,7 +444,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
                 mkdir($user_album_dir.'/'.$photos['name'], 0777, true);
             }
             $created_albums[] = $photos['name'];
-            $folders[]      = $user_album_dir.'/'.$photos['name'];
+            $folders[] = $user_album_dir.'/'.$photos['name'];
             foreach ($photos['photos']['data'] as $key => $each) {
                 $photos['data'][$key]['picture'] = $each['source'];
                 $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
@@ -461,7 +461,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         }
         
         $folders = array_unique($folders);
-        if (count($album_ids)>1) {
+        if (count($album_ids) > 1) {
             $album_name = 'albums';
         } else {
             $album_name = 'album';
@@ -470,7 +470,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $archive = $zippy
             ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
         unset($folders[0]);
-        if (is_array($folders) && parseFloat(count($folders)>0)) {
+        if (is_array($folders) && parseFloat(count($folders) > 0)) {
             $archive->addMembers($folders, true);
         }
         
@@ -500,12 +500,12 @@ $app->group('/album', function () use ($app, $model, $fb) {
         
     });
 
-    $app->get('/upload', function () use ($app, $model, $fb) {
+    $app->get('/upload', function() use ($app, $model, $fb) {
 
         $is_user_exists = $model->getUser($_SESSION['user_id']);
     
         if ($is_user_exists) {
-            $is_user_exists = (array) $is_user_exists;
+            $is_user_exists = (array)$is_user_exists;
             if ($is_user_exists['g_access_token'] == '') {
                 $app->contentType('application/json;charset=utf-8');
                 echo json_encode(array('status' => 'need_google_login'));
@@ -538,7 +538,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
             }
             $created_albums[] = $photos['name'];
             $folders[] = $user_album_dir.'/'.$photos['name'];
-            $picasa_album   = create_album($photos['name']);
+            $picasa_album = create_album($photos['name']);
             
             $uri = '';
             foreach ($picasa_album->link as $entry) {
