@@ -74,16 +74,28 @@ $app->configureMode('development', function () use ($app) {
 // Configs for mode "production"
 $app->configureMode('production', function () use ($app) {
     // Set the configs for production environment
+    include 'inc/config.php';
     $app->config(array(
         'debug' => false,
-        'log.enable' => true,
         'database' => array(
-            'db_host' => '',
+            'db_host' => $db['host'],
             'db_port' => '',
-            'db_name' => '',
-            'db_user' => '',
-            'db_pass' => ''
+            'db_name' => $db['db'],
+            'db_user' => $db['user'],
+            'db_pass' => $db['password']
+        ),
+        'fb' => array(
+            'app_id'        => $fb['app_id'],
+            'app_secret'    => $fb['app_secret'],
+            'callback_url'  => $fb['callback_url']
+        ),
+
+        'google' => array(
+            'client_id'         => $google['client_id'],
+            'client_secret'     => $google['client_secret'],
+            'callback_url'      => $google['callback_url']
         )
+
     ));
 });
 
