@@ -19,9 +19,9 @@ Features of this application:
 [**http://fbphotos.metroplex.in**](http://fbphotos.metroplex.in)
 
 ## Libraries And Framework Used
-* [**https://github.com/panique/mini2**](Mini 2) - Uses Slim Framework
-* [**https://github.com/facebook/facebook-php-sdk-v4**](Facebook PHP SDK-v4)
-* [**https://github.com/alchemy-fr/Zippy**](Zippy) - To Create Archives 
+* [**Mini 2**](https://github.com/panique/mini2) - Uses Slim Framework
+* [**Facebook PHP SDK-v4**](https://github.com/facebook/facebook-php-sdk-v4)
+* [**Zippy**](https://github.com/alchemy-fr/Zippy) - To Create Archives 
 
 
 ## Installation
