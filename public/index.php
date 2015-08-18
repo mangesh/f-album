@@ -14,7 +14,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'development'
+    'mode' => 'production'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
@@ -311,6 +311,10 @@ $app->get('/callback', function () use ($app, $model, $fb) {
 
 $app->get('/home', function () use ($app, $model, $fb) {
     
+    //$app->etag('unique-id');
+    //$app->lastModified(1286139652);
+    
+
     $fb_cred = $app->config('fb');
     $google_cred = $app->config('google');
 
@@ -378,12 +382,23 @@ $app->get('/home', function () use ($app, $model, $fb) {
             unset($albums_array[$key]);
         }
     }
-    
+    $app->etag('unique-resource-id');
+    $app->expires('+1 week');
     $app->render('home.twig', array(
             'profile_picture'   => $img,
             'name'              => $_SESSION['user_name'],
             'albums'            => $albums_array
         ));
+});
+
+// Error Handler for any uncaught exception
+// -----------------------------------------------------------------------------
+// This can be silenced by turning on Slim Debugging. All exceptions thrown by
+// our application will be collected here.
+$app->error(function (\Exception $e) use ($app) {
+    $app->render('error.twig', array(
+        'message' => $e->getMessage()
+    ), 500);
 });
 
 // This is nothing but a logout page

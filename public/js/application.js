@@ -209,7 +209,9 @@ $(function () {
                 $('.link-alert').show();
                 $('button.download').attr('disabled', false);
                 $.loader.close(true);
-                
+                $( "html, body" ).animate({
+                    scrollTop: 0
+                }, 800);
             }).fail(function () {
             }).always(function () {
             })
@@ -256,6 +258,9 @@ $(function () {
                     $('li.album').removeClass('active selected');
                     $('.selected-picasa-albums').attr('disabled',true);
                     $('.upload-alert').show();
+                    $( "html, body" ).animate({
+                        scrollTop: 0
+                    }, 800)
                 }
                 $.loader.close(true);
             }).fail(function () {
