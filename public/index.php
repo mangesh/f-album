@@ -164,7 +164,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
         $response = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         
-        if ($http_code === 200 and (isset($_SESSION['user_id']))) {
+        if ($http_code === 200 && (isset($_SESSION['user_id']))) {
             $response = (array)json_decode($response);
             $_SESSION['g_access_token']     = $response["access_token"];
             $_SESSION['refresh_token']      = $response["refresh_token"];
@@ -272,7 +272,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
         } else {
             //print_r($is_user_exists); echo time(); die();
             $is_user_exists = (array)$is_user_exists;
-            if (isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> '') {
+            if (isset($is_user_exists['g_access_token']) && $is_user_exists['g_access_token'] <> '') {
                 if ($is_user_exists['expires_in'] < time()) {
                     $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
                     if ($refresh) {
@@ -336,7 +336,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
     
     if ($is_user_exists) {
         $is_user_exists = (array)$is_user_exists;
-        if (isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> '') {
+        if (isset($is_user_exists['g_access_token']) && $is_user_exists['g_access_token'] <> '') {
             if ($is_user_exists['expires_in'] < time()) {
                 $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
                 if ($refresh) {
@@ -470,7 +470,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $archive = $zippy
             ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
         unset($folders[0]);
-        if (is_array($folders) and (count($folders)>0)) {
+        if (is_array($folders)parseFloat(count($folders)>0)) {
             $archive->addMembers($folders, true);
         }
         
@@ -523,7 +523,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
             recursive_remove_directory($user_album_dir);
         }
 
-        $created_albums = array();
+        $created_albums = $folders = array();
         foreach ($album_ids as $key => $album_id) {
             $photos = $fb
                 ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')

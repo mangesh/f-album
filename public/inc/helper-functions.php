@@ -26,7 +26,7 @@
     function recursive_check_directory_name($directory, $name)
     {
         foreach (glob("{$directory}/*") as $i => $file) {
-            if (is_dir($file) and $file == $name) {
+            if (is_dir($file) && $file == $name) {
                 $prefix = substr($file, -1);
                 if ((int)$prefix !== 0) {
                     $file = substr($file, 0, -1);
@@ -67,8 +67,6 @@
                         term='http://schemas.google.com/photos/2007#album'></category>
                     </entry>";
 
-        //Setup our cURL options
-        //Notice the last one where we pass in the authentication header
         $ch = curl_init();
         $options = array(
                     CURLOPT_URL => $feedUrl,
@@ -84,10 +82,7 @@
                 );
         curl_setopt_array($ch, $options);
 
-        //This call will create the Picasa album.
-        //The return value is XML with a bunch of information about the newly created album.
         $response   = curl_exec($ch);
-        //print_r($response);
         $album      = simplexml_load_string($response);
         return $album;
     }
@@ -185,7 +180,6 @@
 
     function update_token($google_cred, $refresh_token)
     {
-        $clientId       = $google_cred['client_id'];
         $clientSecret   = $google_cred['client_secret'];
         $referer        = 'http://fb.dev/home';
 

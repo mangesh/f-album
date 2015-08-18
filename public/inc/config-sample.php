@@ -11,3 +11,9 @@
             'app_secret'    => '',
             'callback_url'  => ''
         );
+
+    $google = array(
+            'client_id'         => '',
+            'client_secret'     => '',
+            'callback_url'      => ''
+        );

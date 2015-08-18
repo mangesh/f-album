@@ -34,8 +34,6 @@ class Model
         $sql = "INSERT INTO user (user_id, name, email) VALUES (:user_id, :name, :email)";
         $query = $this->db->prepare($sql);
         $parameters = array(':user_id' => $user_id, ':name' => $name, ':email' => $email);
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . \PdoDebugger::show($sql, $parameters); exit();
         $query->execute($parameters);
     }
 
@@ -58,7 +56,6 @@ class Model
         $sql = "UPDATE user SET g_access_token = :g_access_token, refresh_token = :refresh_token, token_type = :token_type, expires_in = :expires_in WHERE user_id = :user_id";
         $query = $this->db->prepare($sql);
         $parameters = array(':g_access_token' => $g_access_token, ':refresh_token' => $refresh_token, ':token_type' => $token_type, ':expires_in' => $expires_in, ':user_id' => $user_id);
-        //echo '[ PDO DEBUG ]: ' . \PdoDebugger::show($sql, $parameters); exit();
         $query->execute($parameters);
     }
 

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Sign In</title>
+        <script type="text/javascript">
+            function closeThis()
+            {
+                window.opener.oauth_complete(); 
+                window.close();
+            }
+        </script>
+    </head>
+    <body onload="closeThis();">
+    </body>
+</html>
