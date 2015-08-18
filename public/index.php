@@ -134,7 +134,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
     if (isset($_GET['code'])) {
         $clientId       = $google_cred['client_id'];
         $clientSecret   = $google_cred['client_secret'];
-        $referer        = 'http://fb.dev/home';
+        $referer        = current_page_url().'/home';
 
         $postBody = 'code='.urlencode($_GET['code'])
                   .'&grant_type=authorization_code'
@@ -149,7 +149,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
                , CURLOPT_URL => 'https://accounts.google.com/o/oauth2/token'
                , CURLOPT_HTTPHEADER => array( 'Content-Type: application/x-www-form-urlencoded'
                                              , 'Content-Length: '.strlen($postBody)
-                                             , 'User-Agent: YourApp/0.1 +http://fb.dev/home'
+                                             , 'User-Agent: f-album/0.1 +'.$referer
                                              )
                , CURLOPT_POSTFIELDS => $postBody
                , CURLOPT_REFERER => $referer
@@ -178,28 +178,9 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
                 $_SESSION['expires_in']
             );
         }
-       
-        ?>
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-                <title>Sign In</title>
-                <script type="text/javascript">
-                    function closeThis()
-                    {
-                        window.opener.oauth_complete(); 
-                        window.close();
-                    }
-                </script>
-            </head>
-            <body onload="closeThis();">
-            </body>
-        </html>
-    <?php
+        $app->render('g_callback.twig');
     } else {
-        echo 'Code was not provided.';
+        $app->redirect('/?error=code-not-found');
     }
 });
 
@@ -395,7 +376,6 @@ $app->get('/home', function () use ($app, $model, $fb) {
             'name'              => $_SESSION['user_name'],
             'albums'            => $albums_array
         ));
-
 });
 
 // This is nothing but a logout page

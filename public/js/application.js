@@ -271,41 +271,12 @@ $(function () {
     }
 
     $('#openModal').on('shown.bs.modal', function () {
-        //$carousel = $('.carousel').imagesLoaded( function() {
+        
         var $carousel = $('.carousel').carousel({
             interval: 3000
-        });//.hide();
-        $carousel.carousel('cycle');
-        //})
-        
-        /*$('.carousel').carousel();*/
-        /*$('.inner-circles-loader').show();
-        var carousel = $(this).find('.carousel').hide();
-        var deferreds = [];
-        var imgs = $('.carousel', this).find('img');
-        // loop over each img
-        console.log('open event');
-        imgs.each(function(){
-            var self = $(this);
-            var datasrc = self.attr('data-src');
-            if (datasrc) {
-                var d = $.Deferred();
-                self.one('load', d.resolve)
-                    .attr("src", datasrc)
-                    .attr('data-src', '');
-                deferreds.push(d.promise());
-            }
         });
-
-        $.when.apply($, deferreds).done(function(){
-            $('.inner-circles-loader').hide()
-            console.log('open deferreds');
-            carousel.fadeIn(1000);
-        });*/
-    });
-
-    $(window).on('resize', function(){
-        ///$('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+        $carousel.carousel('cycle');
+        
     });
 
     var gutter = parseInt(jQuery('.album').css('marginBottom'));

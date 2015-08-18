@@ -1,5 +1,16 @@
 <?php
     
+    function current_page_url()
+    {
+        $page_url = 'http';
+        if ($_SERVER["HTTPS"] == "on") {
+            $page_url .= "s";
+        }
+        $page_url .= "://";
+        $page_url .= $_SERVER["SERVER_NAME"];
+        return $page_url;
+    }   
+
     function recursive_remove_directory($directory)
     {
         foreach (glob("{$directory}/*") as $file) {
