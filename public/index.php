@@ -1,6 +1,7 @@
 <?php
-/******************************* LOADING & INITIALIZING BASE APPLICATION ****************************************/
+/******************************* LOADING & INITIALIZING BASE APPLICATION ***************************************/
 // Configuration for error reporting, useful to show every little problem during development
+include 'inc/helper-functions.php';
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 set_time_limit(0);
@@ -44,7 +45,7 @@ $app->configureMode('development', function () use ($app) {
         //$minifier->minify('js/bootstrap.min.js');
     });
 
-    require 'inc/config.php';
+    include 'inc/config.php';
     // Set the configs for development environment
     $app->config(array(
         'debug' => true,
@@ -121,77 +122,18 @@ $app->get('/', function () use ($app, $fb) {
 
 });
 
-function update_token($google_cred, $refresh_token)
-{
-    $clientId       = $google_cred['client_id'];
-    $clientSecret   = $google_cred['client_secret'];
-    $referer        = 'http://fb.dev/home';
-
-    $postBody = 'refresh_token='.urlencode($refresh_token)
-              .'&grant_type=refresh_token'
-              .'&client_id='.urlencode($google_cred['client_id'])
-              .'&client_secret='.urlencode($google_cred['client_secret']);
-
-    $curl = curl_init();
-            curl_setopt_array( $curl,
-                array( CURLOPT_CUSTOMREQUEST => 'POST'
-                       , CURLOPT_URL => 'https://accounts.google.com/o/oauth2/token'
-                       , CURLOPT_HTTPHEADER => array( 'Content-Type: application/x-www-form-urlencoded'
-                                                     , 'Content-Length: '.strlen($postBody)
-                                                     , 'User-Agent: YourApp/0.1 +http://fb.dev/home'
-                                                     )
-                       , CURLOPT_POSTFIELDS => $postBody                         
-                       , CURLOPT_REFERER => $referer
-                       , CURLOPT_RETURNTRANSFER => 1 // means output will be a return value from curl_exec() instead of simply echoed
-                       , CURLOPT_TIMEOUT => 120 // max seconds to wait
-                       , CURLOPT_FOLLOWLOCATION => 0 // don't follow any Location headers, use only the CURLOPT_URL, this is for security
-                       , CURLOPT_FAILONERROR => 0 // do not fail verbosely fi the http_code is an error, this is for security
-                       , CURLOPT_SSL_VERIFYPEER => 0 // do verify the SSL of CURLOPT_URL, this is for security
-                       , CURLOPT_VERBOSE => 0 // don't output verbosely to stderr, this is for security
-                ));
-    $response = curl_exec($curl);
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    $response = (array)json_decode($response);
-
-    /*curl_close($curl);  
-    var_dump($response = json_decode($response));
-    var_dump($http_code); die();*/
-    if ($http_code === 200) {
-        return $response;
-    } else {
-        return false;
-    }
-}
-
+// Process the google callback request
 $app->get('/google_callback', function () use ($app, $model, $fb) {
     $google_cred = $app->config('google');
-    // visit this page in a browser
-    // https://accounts.google.com/o/oauth2/auth?scope=https://picasaweb.google.com/data/&response_type=code&access_type=offline&redirect_uri=https://fb.dev/yourapp/oauth2.php&approval_prompt=force&client_id=407408718192.apps.googleusercontent.com
-    //
-    // and click approve and you will be redirected here
-    // https://fb.dev/yourapp/oauth2.php?code=PkqD6reYULMKKrrasEB2G5D0osYXmFaGhtV8o4/WqYg8dkXvfARQvtJS9iHerQj1C0.4iWMDCKlAI
-    //
-    // which will send the code to
-    // https://accounts.google.com/o/oauth2/token
-    //
-    // and get a response like the follwing
-    // { "access_token"  : "ym2BEd9.ej9XnOINtBVUbDa222Oy0bYXhhT_mvGaD4ixiSXYwD4Y8lv0EyzggaV6Ifn7MMyoYTJdoaqL0zA"
-    // , "token_type"    : "Bearer"
-    // , "expires_in"    : 3600
-    // , "refresh_token" : "1/Pv3c5PgT6s3bFxndmfv89sIWls-LgTvMEudVrK5jSx2P9mTDCzXwupoR30zcRFq6" 
-    // }
+    
     if (empty($_SESSION['fb_access_token'])) {
         $app->redirect('/clearsession');
         exit;
     }
-    /*if ($_SESSION['g_access_token']) {
-        $app->redirect('/home');
-        exit;
-    }*/
-    if (isset($_GET['code']))
-    {
+    
+    if (isset($_GET['code'])) {
         $clientId       = $google_cred['client_id'];
-        $clientSecret   = $google_cred['client_secret']; 
+        $clientSecret   = $google_cred['client_secret'];
         $referer        = 'http://fb.dev/home';
 
         $postBody = 'code='.urlencode($_GET['code'])
@@ -201,28 +143,27 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
                   .'&client_secret='.urlencode($google_cred['client_secret']);
 
         $curl = curl_init();
-                curl_setopt_array( $curl,
-                    array( CURLOPT_CUSTOMREQUEST => 'POST'
-                           , CURLOPT_URL => 'https://accounts.google.com/o/oauth2/token'
-                           , CURLOPT_HTTPHEADER => array( 'Content-Type: application/x-www-form-urlencoded'
-                                                         , 'Content-Length: '.strlen($postBody)
-                                                         , 'User-Agent: YourApp/0.1 +http://fb.dev/home'
-                                                         )
-                           , CURLOPT_POSTFIELDS => $postBody                              
-                           , CURLOPT_REFERER => $referer
-                           , CURLOPT_RETURNTRANSFER => 1 // means output will be a return value from curl_exec() instead of simply echoed
-                           , CURLOPT_TIMEOUT => 120 // max seconds to wait
-                           , CURLOPT_FOLLOWLOCATION => 0 // don't follow any Location headers, use only the CURLOPT_URL, this is for security
-                           , CURLOPT_FAILONERROR => 0 // do not fail verbosely fi the http_code is an error, this is for security
-                           , CURLOPT_SSL_VERIFYPEER => 0 // do verify the SSL of CURLOPT_URL, this is for security
-                           , CURLOPT_VERBOSE => 0 // don't output verbosely to stderr, this is for security
-                    )
-                );
+        curl_setopt_array(
+            $curl,
+            array( CURLOPT_CUSTOMREQUEST => 'POST'
+               , CURLOPT_URL => 'https://accounts.google.com/o/oauth2/token'
+               , CURLOPT_HTTPHEADER => array( 'Content-Type: application/x-www-form-urlencoded'
+                                             , 'Content-Length: '.strlen($postBody)
+                                             , 'User-Agent: YourApp/0.1 +http://fb.dev/home'
+                                             )
+               , CURLOPT_POSTFIELDS => $postBody
+               , CURLOPT_REFERER => $referer
+               , CURLOPT_RETURNTRANSFER => 1
+               , CURLOPT_TIMEOUT => 120
+               , CURLOPT_FOLLOWLOCATION => 0
+               , CURLOPT_FAILONERROR => 0
+               , CURLOPT_SSL_VERIFYPEER => 0
+               , CURLOPT_VERBOSE => 0
+            )
+        );
         $response = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        /*curl_close($curl);  
-        var_dump($response = json_decode($response));
-        var_dump($http_code); die();*/
+        
         if ($http_code === 200 and (isset($_SESSION['user_id']))) {
             $response = (array)json_decode($response);
             $_SESSION['g_access_token']     = $response["access_token"];
@@ -257,9 +198,9 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
             </body>
         </html>
     <?php
+    } else {
+        echo 'Code was not provided.';
     }
-    else { echo 'Code was not provided.'; }
-
 });
 
 $app->get('/callback', function () use ($app, $model, $fb) {
@@ -350,10 +291,10 @@ $app->get('/callback', function () use ($app, $model, $fb) {
         } else {
             //print_r($is_user_exists); echo time(); die();
             $is_user_exists = (array)$is_user_exists;
-            if(isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> ''){
+            if (isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> '') {
                 if ($is_user_exists['expires_in'] < time()) {
                     $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
-                    if($refresh){
+                    if ($refresh) {
                         $response = $refresh;
                         $_SESSION['g_access_token']     = $response["access_token"];
                         $_SESSION['refresh_token']      = $is_user_exists['refresh_token'];
@@ -414,10 +355,10 @@ $app->get('/home', function () use ($app, $model, $fb) {
     
     if ($is_user_exists) {
         $is_user_exists = (array)$is_user_exists;
-        if(isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> ''){
+        if (isset($is_user_exists['g_access_token']) and $is_user_exists['g_access_token'] <> '') {
             if ($is_user_exists['expires_in'] < time()) {
                 $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
-                if($refresh){
+                if ($refresh) {
                     $response = $refresh;
                     $_SESSION['g_access_token']     = $response["access_token"];
                     $_SESSION['refresh_token']      = $is_user_exists['refresh_token'];
@@ -442,18 +383,13 @@ $app->get('/home', function () use ($app, $model, $fb) {
 
     $albums = $fb->next($albums);
     $albums_array = array_merge($albums_array, $albums->asArray());
-    //var_dump($albums_array); die();
-    /*if(is_array($albums)){
-        foreach ($albums as $key => $each){
-            $photos = $fb->get('/'.$each['id'].'/photos?fields=id,picture,name&limit=50')->getDecodedBody();
-        }
-    }*/
+    
     foreach ($albums_array as $key => $value) {
-        if(($value['count'] == 0)){
+        if (($value['count'] == 0)) {
             unset($albums_array[$key]);
         }
     }
-    //$app->render('index.twig');
+    
     $app->render('home.twig', array(
             'profile_picture'   => $img,
             'name'              => $_SESSION['user_name'],
@@ -482,170 +418,8 @@ $app->get('/sign-out', function () use ($app) {
     exit;
 });
 
-function recursive_remove_directory($directory)
-{
-    foreach(glob("{$directory}/*") as $file)
-    {
-        if(is_dir($file)) { 
-            recursive_remove_directory($file);
-        } else {
-            unlink($file);
-        }
-    }
-    rmdir($directory);
-}
-
-function recursive_check_directory_name($directory, $name)
-{
-    foreach(glob("{$directory}/*") as $i => $file)
-    {
-        if(is_dir($file) and $file == $name) { 
-            $prefix = substr($file, -1);
-            if((int)$prefix !== 0){
-                $file = substr($file, 0, -1);
-            }
-            $prefix = (int)$prefix+1;
-
-            $name = recursive_check_directory_name($directory, trim($file).' '.$prefix);
-        } 
-    }
-    return $name;
-}
-
-function filename_safe($name)
-{ 
-    $except = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '.', '(', ')', ';'); 
-    return str_replace($except, '', $name); 
-}
-
-function create_album($album_name = '')
-{
-    if ($album_name == '') {
-        return false;
-    }
-    //This is the authentication header we'll need to pass with each successive call
-    $authHeader = 'Authorization:  Bearer '.$_SESSION['g_access_token'].'"';
-    $userId = "default";
-    $feedUrl = "https://picasaweb.google.com/data/feed/api/user/$userId";
-
-    //This is the XML for creating a new album.
-    $rawXml = "<entry xmlns='http://www.w3.org/2005/Atom'
-                    xmlns:media='http://search.yahoo.com/mrss/'
-                    xmlns:gphoto='http://schemas.google.com/photos/2007'>
-                    <title type='text'>".$album_name."</title>
-                    <summary type='text'>Facebook album uploaded via f-album app</summary>
-                    <gphoto:access>private</gphoto:access>
-                    <gphoto:timestamp>".time()."</gphoto:timestamp>
-                    <category scheme='http://schemas.google.com/g/2005#kind'
-                    term='http://schemas.google.com/photos/2007#album'></category>
-                </entry>";
-
-    //Setup our cURL options
-    //Notice the last one where we pass in the authentication header
-    $ch = curl_init();  
-    $options = array(
-                CURLOPT_URL=> $feedUrl,
-                CURLOPT_SSL_VERIFYPEER=> false,
-                CURLOPT_RETURNTRANSFER => 1,
-                CURLOPT_VERBOSE => 0,
-                CURLOPT_POST=> true,
-                CURLOPT_RETURNTRANSFER=> true,
-                CURLOPT_HEADER=> false,
-                CURLOPT_FOLLOWLOCATION=> true,
-                CURLOPT_POSTFIELDS=> $rawXml,
-                CURLOPT_HTTPHEADER=> array('GData-Version:  2', $authHeader, 'Content-Type:  application/atom+xml')
-            );
-    curl_setopt_array($ch, $options);
-
-    //This call will create the Picasa album.
-    //The return value is XML with a bunch of information about the newly created album.
-    $response   = curl_exec($ch);
-    //print_r($response);
-    $album      = simplexml_load_string($response);
-    return $album;
-}
-
-function upload_photos_to_picasa($album_id = '', $photos_dir = '')
-{
-    if ($album_id == '') {
-        return false;
-    }
-    
-    //This is the authentication header we'll need to pass with each successive call
-    $authHeader = 'Authorization:  Bearer '.$_SESSION['g_access_token'].'"';
-    foreach(glob("{$photos_dir}/*") as $file)
-    {
-        if(!is_dir($file)) { 
-            $albumUrl = $album_id;
-            $imgName = $_SERVER['DOCUMENT_ROOT'].'/'.$file;
-
-            /*$rawImgXml = '<entry xmlns="http://www.w3.org/2005/Atom">
-                          <title>image.jpg</title>
-                          <summary>Picture from f-album.</summary>
-                          <category scheme="http://schemas.google.com/g/2005#kind"
-                            term="http://schemas.google.com/photos/2007#photo"/>
-                        </entry>';
-
-            $fileSize   = filesize($imgName);
-            $fh         = fopen($imgName, 'rb');
-            $imgData    = fread($fh, $fileSize);
-            fclose($fh);
-
-            $dataLength = strlen($rawImgXml) + $fileSize;
-            $data = "";
-            $data .= "\nMedia multipart posting\n";
-            $data .= "--P4CpLdIHZpYqNn7\n";
-            $data .= "Content-Type: application/atom+xml\n\n";
-            $data .= $rawImgXml . "\n";
-            $data .= "--P4CpLdIHZpYqNn7\n";
-            $data .= "Content-Type: image/jpeg\n\n";
-            $data .= $imgData . "\n";
-            $data .= "--P4CpLdIHZpYqNn7--";
-
-            $header = array('GData-Version:  2', $authHeader, 'Content-Type: multipart/related; boundary=P4CpLdIHZpYqNn7;', 'Content-Length: ' . strlen($data), 'MIME-version: 1.0');
-
-            $ret = "";
-            $ch  = curl_init($albumUrl);
-            $options = array(
-                    CURLOPT_SSL_VERIFYPEER=> false,
-                    CURLOPT_POST=> true,
-                    CURLOPT_RETURNTRANSFER=> true,
-                    CURLOPT_HEADER=> true,
-                    CURLOPT_FOLLOWLOCATION=> true,
-                    CURLOPT_POSTFIELDS=> $data,
-                    CURLOPT_HTTPHEADER=> $header
-                );*/
-
-            //Get the binary image data
-            $fileSize = filesize($imgName);
-            $fh = fopen($imgName, 'rb');
-            $imgData = fread($fh, $fileSize);
-            fclose($fh);
-
-            $header = array('GData-Version:  2', $authHeader, 'Content-Type: image/jpeg', 'Content-Length: ' . $fileSize, 'Slug: cute_baby_kitten.jpg');
-            $data = $imgData; //Make sure the image data is NOT Base64 encoded otherwise the upload will fail with a "Not an image" error
-
-            $ret = "";
-            $ch  = curl_init($albumUrl);
-            $options = array(
-                    CURLOPT_SSL_VERIFYPEER=> false,
-                    CURLOPT_POST=> true,
-                    CURLOPT_RETURNTRANSFER=> true,
-                    CURLOPT_HEADER=> true,
-                    CURLOPT_FOLLOWLOCATION=> true,
-                    CURLOPT_POSTFIELDS=> $data,
-                    CURLOPT_HTTPHEADER=> $header
-                );
-            curl_setopt_array($ch, $options);
-            $ret = curl_exec($ch);
-            curl_close($ch);
-        }
-    }
-    
-}
-
 // GET request on /album/:id. Should be self-explaining. 
-$app->group('/album', function () use ($app, $model, $fb){
+$app->group('/album', function () use ($app, $model, $fb) {
 
     $app->get('/', function () use ($app, $model, $fb) {
 
@@ -655,7 +429,7 @@ $app->group('/album', function () use ($app, $model, $fb){
         $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source},name&limit=50')->getDecodedBody();
         
         foreach ($photos['photos']['data'] as $key => $each) {
-            $photos['data'][$key]['picture'] = $each['source'];    
+            $photos['data'][$key]['picture'] = $each['source'];
         }
 
         $app->contentType('application/json;charset=utf-8');
@@ -664,7 +438,7 @@ $app->group('/album', function () use ($app, $model, $fb){
     });
 
     
-    $app->get('/download', function () use ($app, $model, $fb){
+    $app->get('/download', function () use ($app, $model, $fb) {
 
         $album_ids      = $_GET['id'];
         $time           = time();
@@ -678,8 +452,9 @@ $app->group('/album', function () use ($app, $model, $fb){
 
         $created_albums = array();
         foreach ($album_ids as $key => $album_id) {
-            
-            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')->getDecodedBody();
+            $photos = $fb
+                ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
+                ->getDecodedBody();
             $photos['name'] = filename_safe($photos['name']);
             $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
             $unique_name = explode('/', $unique_name);
@@ -691,11 +466,10 @@ $app->group('/album', function () use ($app, $model, $fb){
             $created_albums[] = $photos['name'];
             $folders[]      = $user_album_dir.'/'.$photos['name'];
             foreach ($photos['photos']['data'] as $key => $each) {
-                $photos['data'][$key]['picture'] = $each['source'];    
-                
+                $photos['data'][$key]['picture'] = $each['source'];
                 $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
                 $ch = curl_init($each['source']);
-                curl_setopt($ch, CURLOPT_NOPROGRESS, false );
+                curl_setopt($ch, CURLOPT_NOPROGRESS, false);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -713,10 +487,11 @@ $app->group('/album', function () use ($app, $model, $fb){
             $album_name = 'album';
         }
         $zippy = Zippy::load();
-        $archive = $zippy->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
+        $archive = $zippy
+            ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
         unset($folders[0]);
-        if(is_array($folders) and (count($folders)>0)){
-            $archive->addMembers($folders,true);
+        if (is_array($folders) and (count($folders)>0)) {
+            $archive->addMembers($folders, true);
         }
         
         if (!file_exists($user_album_dir)) {
@@ -725,7 +500,7 @@ $app->group('/album', function () use ($app, $model, $fb){
 
         $zip_path   = 'user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip';
         $dest       = $user_album_dir.'/'.$album_name.'.zip';
-        copy($zip_path,$dest);
+        copy($zip_path, $dest);
         
         //chdir('user_albums');
         //chmod($_SESSION['user_id'].'_'.'albums'.'.zip',0777);
@@ -745,13 +520,13 @@ $app->group('/album', function () use ($app, $model, $fb){
         
     });
 
-    $app->get('/upload', function () use ($app, $model, $fb){
+    $app->get('/upload', function () use ($app, $model, $fb) {
 
         $is_user_exists = $model->getUser($_SESSION['user_id']);
     
         if ($is_user_exists) {
-            $is_user_exists = (array)$is_user_exists;
-            if($is_user_exists['g_access_token'] == ''){
+            $is_user_exists = (array) $is_user_exists;
+            if ($is_user_exists['g_access_token'] == '') {
                 $app->contentType('application/json;charset=utf-8');
                 echo json_encode(array('status' => 'need_google_login'));
                 exit();
@@ -770,8 +545,8 @@ $app->group('/album', function () use ($app, $model, $fb){
 
         $created_albums = array();
         foreach ($album_ids as $key => $album_id) {
-            
-            $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
+            $photos = $fb
+                ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
                 ->getDecodedBody();
             $photos['name'] = filename_safe($photos['name']);
             $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
@@ -787,16 +562,16 @@ $app->group('/album', function () use ($app, $model, $fb){
             
             $uri = '';
             foreach ($picasa_album->link as $entry) {
-                if($uri == ''){
+                if ($uri == '') {
                     $uri = $entry->attributes()->{'href'}[0];
                 }
             }
             foreach ($photos['photos']['data'] as $key => $each) {
-                $photos['data'][$key]['picture'] = $each['source'];    
+                $photos['data'][$key]['picture'] = $each['source'];
                 
                 $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
                 $ch = curl_init($each['source']);
-                curl_setopt($ch, CURLOPT_NOPROGRESS, false );
+                curl_setopt($ch, CURLOPT_NOPROGRESS, false);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -821,9 +596,5 @@ $app->group('/album', function () use ($app, $model, $fb){
         
     });
 });
-
-
-
 /******************************************* RUN THE APP *******************************************************/
-
 $app->run();
