@@ -1,5 +1,4 @@
-View/Manage Facebook Albums 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mangesh/f-album/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mangesh/f-album/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/mangesh/f-album/badges/build.png?b=master)](https://scrutinizer-ci.com/g/mangesh/f-album/build-status/master)
+Facebook Albums App [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mangesh/f-album/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mangesh/f-album/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/mangesh/f-album/badges/build.png?b=master)](https://scrutinizer-ci.com/g/mangesh/f-album/build-status/master)
 ================================================================================
 > Small application to manage your facebook albums
 
