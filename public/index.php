@@ -470,7 +470,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $archive = $zippy
             ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
         unset($folders[0]);
-        if (is_array($folders)parseFloat(count($folders)>0)) {
+        if (is_array($folders) && parseFloat(count($folders)>0)) {
             $archive->addMembers($folders, true);
         }
         
