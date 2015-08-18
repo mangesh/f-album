@@ -1,5 +1,4 @@
 <?php
-include __DIR__ .'/../public/inc/helper-functions.php';
 require_once __DIR__ . '/../lib/vendor/autoload.php';
 
 error_reporting(E_ALL);
