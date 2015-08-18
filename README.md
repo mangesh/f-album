@@ -9,9 +9,19 @@ Features of this application:
 * Take backup/export of your albums on your machine in just few clicks.
 * Easily upload all your facebook albums to your picasa/google+ account.
 
+####Additionally
+* Built on Slim Framework
+* RESTful routes
+* Uses Facebook Graph API v2.4
+
 ## Demo
 
 [**http://fbphotos.metroplex.in**](http://fbphotos.metroplex.in)
+
+## Libraries And Framework Used
+* [**https://github.com/panique/mini2**](Mini 2) - Uses Slim Framework
+* [**https://github.com/facebook/facebook-php-sdk-v4**](Facebook PHP SDK-v4)
+* [**https://github.com/alchemy-fr/Zippy**](Zippy) - To Create Archives 
 
 
 ## Installation
