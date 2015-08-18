@@ -221,8 +221,6 @@ $app->get('/callback', function () use ($app, $model, $fb) {
 
     // Get the access token metadata from /debug_token
     $tokenMetadata = $oAuth2Client->debugToken($accessToken);
-    //echo '<h3>Metadata</h3>';
-    //var_dump($tokenMetadata);
 
     // Validation (these will throw FacebookSDKException's when they fail)
     $tokenMetadata->validateAppId($fb_cred['app_id']);
@@ -239,8 +237,6 @@ $app->get('/callback', function () use ($app, $model, $fb) {
             exit;
         }
 
-        //echo '<h3>Long-lived</h3>';
-        //var_dump($accessToken->getValue());
     }
 
     $_SESSION['fb_access_token'] = (string) $accessToken;
@@ -430,7 +426,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
             recursive_remove_directory($user_album_dir);
         }
 
-        $created_albums = array();
+        $created_albums = $folders = array();
         foreach ($album_ids as $key => $album_id) {
             $photos = $fb
                 ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
@@ -482,10 +478,10 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $dest       = $user_album_dir.'/'.$album_name.'.zip';
         copy($zip_path, $dest);
         
-        //chdir('user_albums');
-        //chmod($_SESSION['user_id'].'_'.'albums'.'.zip',0777);
-        //unlink($_SESSION['user_id'].'_'.'albums'.'.zip');
-        //chdir('..');
+        /*chdir('user_albums');
+        chmod($_SESSION['user_id'].'_'.'albums'.'.zip',0777);
+        unlink($_SESSION['user_id'].'_'.'albums'.'.zip');
+        chdir('..');*/
         /* Archive is generate. Delete the folders/albums from server*/
         foreach ($folders as $key => $folder) {
             recursive_remove_directory($folder);
