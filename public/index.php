@@ -14,7 +14,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'production'
+    'mode' => 'development'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
@@ -504,17 +504,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         } else {
             $album_name = 'album';
         }
-        $zippy = Zippy::load();
-        $archive = $zippy
-            ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
-        unset($folders[0]);
-        if (is_array($folders) && (count($folders)>0)) {
-            $archive->addMembers($folders, true);
-        }
         
-        if (!file_exists($user_album_dir)) {
-            mkdir($user_album_dir, 0777, true);
-        }
         $zippy = Zippy::load();
         $archive = $zippy
             ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
