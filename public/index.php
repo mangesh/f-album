@@ -122,6 +122,12 @@ $app->get('/', function () use ($app, $fb) {
 
 });
 
+$app->get('/privacy-policy', function () use ($app, $fb) {
+
+    $app->render('privacy_policy.twig');
+
+});
+
 // Process the google callback request
 $app->get('/google_callback', function () use ($app, $model, $fb) {
     $google_cred = $app->config('google');
