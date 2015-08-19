@@ -382,7 +382,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
     //
     $albums_array = $albums->asArray();
     $meta_data = $albums->getMetaData();
-    if(isset($metadata['paging']['next'])){
+    if (isset($metadata['paging']['next'])) {
         $albums = $fb->next($albums);
         $albums_array = array_merge($albums_array, $albums->asArray());
     }
