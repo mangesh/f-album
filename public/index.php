@@ -445,10 +445,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
         foreach ($photos as $key => $each) {
             $photos['data'][$key]['picture'] = $each['source'];
         }
-        foreach ($photos['photos']['data'] as $key => $each) {
-            $photos['data'][$key]['picture'] = $each['source'];
-        }
-
+        
         $app->contentType('application/json;charset=utf-8');
         echo json_encode($photos['data']);
  
