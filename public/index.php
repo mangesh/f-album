@@ -14,7 +14,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'development'
+    'mode' => 'production'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
@@ -74,16 +74,28 @@ $app->configureMode('development', function () use ($app) {
 // Configs for mode "production"
 $app->configureMode('production', function () use ($app) {
     // Set the configs for production environment
+    include 'inc/config.php';
     $app->config(array(
         'debug' => false,
-        'log.enable' => true,
         'database' => array(
-            'db_host' => '',
+            'db_host' => $db['host'],
             'db_port' => '',
-            'db_name' => '',
-            'db_user' => '',
-            'db_pass' => ''
+            'db_name' => $db['db'],
+            'db_user' => $db['user'],
+            'db_pass' => $db['password']
+        ),
+        'fb' => array(
+            'app_id'        => $fb['app_id'],
+            'app_secret'    => $fb['app_secret'],
+            'callback_url'  => $fb['callback_url']
+        ),
+
+        'google' => array(
+            'client_id'         => $google['client_id'],
+            'client_secret'     => $google['client_secret'],
+            'callback_url'      => $google['callback_url']
         )
+
     ));
 });
 
@@ -305,6 +317,10 @@ $app->get('/callback', function () use ($app, $model, $fb) {
 
 $app->get('/home', function () use ($app, $model, $fb) {
     
+    //$app->etag('unique-id');
+    //$app->lastModified(1286139652);
+    
+
     $fb_cred = $app->config('fb');
     $google_cred = $app->config('google');
 
@@ -317,7 +333,8 @@ $app->get('/home', function () use ($app, $model, $fb) {
     $accessToken = $_SESSION['fb_access_token'];
     
     $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
-    
+    $permissions = $fb->get('/'.$_SESSION['user_id'].'/permissions')->getGraphEdge();
+    //print_r($permissions); die();
     // Send the request to Graph
     try {
         //$response = $fb->getClient()->sendRequest($request);
@@ -361,23 +378,37 @@ $app->get('/home', function () use ($app, $model, $fb) {
 
     /* Fetch user's albums (50 max)*/
 
-    $albums = $fb->get('/'.$_SESSION['user_id'].'/albums?fields=id,picture,name,count')->getGraphEdge();
+    $albums = $fb->get('/'.$_SESSION['user_id'].'/albums?fields=id,picture,name,count&limit=50')->getGraphEdge();
+    //
     $albums_array = $albums->asArray();
-
-    $albums = $fb->next($albums);
-    $albums_array = array_merge($albums_array, $albums->asArray());
+    $meta_data = $albums->getMetaData();
+    if(isset($metadata['paging']['next'])){
+        $albums = $fb->next($albums);
+        $albums_array = array_merge($albums_array, $albums->asArray());
+    }
     
     foreach ($albums_array as $key => $value) {
         if (($value['count'] == 0)) {
             unset($albums_array[$key]);
         }
     }
-    
+    $app->etag('unique-resource-id');
+    $app->expires('+1 day');
     $app->render('home.twig', array(
             'profile_picture'   => $img,
             'name'              => $_SESSION['user_name'],
             'albums'            => $albums_array
         ));
+});
+
+// Error Handler for any uncaught exception
+// -----------------------------------------------------------------------------
+// This can be silenced by turning on Slim Debugging. All exceptions thrown by
+// our application will be collected here.
+$app->error(function (\Exception $e) use ($app) {
+    $app->render('error.twig', array(
+        'message' => $e->getMessage()
+    ), 500);
 });
 
 // This is nothing but a logout page
@@ -408,8 +439,12 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $album_id = $_GET['id'];
     
         $fb->setDefaultAccessToken($_SESSION['fb_access_token']);
-        $photos = $fb->get('/'.$album_id.'?fields=id,picture,photos{source},name&limit=50')->getDecodedBody();
-        
+        $all_photos = $fb->get('/'.$album_id.'/photos?fields=id,photos,source,name&limit=1000');
+        $photos = $all_photos->getGraphEdge()->asArray();
+
+        foreach ($photos as $key => $each) {
+            $photos['data'][$key]['picture'] = $each['source'];
+        }
         foreach ($photos['photos']['data'] as $key => $each) {
             $photos['data'][$key]['picture'] = $each['source'];
         }
@@ -434,22 +469,26 @@ $app->group('/album', function () use ($app, $model, $fb) {
 
         $created_albums = $folders = array();
         foreach ($album_ids as $key => $album_id) {
-            $photos = $fb
-                ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
+            $album = $fb
+                ->get('/'.$album_id.'?fields=id,name')
                 ->getDecodedBody();
-            $photos['name'] = filename_safe($photos['name']);
-            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
+            $photos = $fb
+                ->get('/'.$album_id.'/photos?fields=id,photos,source,name&limit=1000')
+                ->getGraphEdge()
+                ->asArray();
+            $album['name'] = filename_safe($album['name']);
+            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$album['name']);
             $unique_name = explode('/', $unique_name);
-            $photos['name'] = trim(end($unique_name));
+            $album['name'] = trim(end($unique_name));
             
-            if (!file_exists($user_album_dir.'/'.$photos['name'])) {
-                mkdir($user_album_dir.'/'.$photos['name'], 0777, true);
+            if (!file_exists($user_album_dir.'/'.$album['name'])) {
+                mkdir($user_album_dir.'/'.$album['name'], 0777, true);
             }
-            $created_albums[] = $photos['name'];
-            $folders[]      = $user_album_dir.'/'.$photos['name'];
-            foreach ($photos['photos']['data'] as $key => $each) {
+            $created_albums[] = $album['name'];
+            $folders[]      = $user_album_dir.'/'.$album['name'];
+            foreach ($photos as $key => $each) {
                 $photos['data'][$key]['picture'] = $each['source'];
-                $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
+                $fp = fopen($user_album_dir.'/'.$album['name'].'/picture_'.($key+1).'.jpg', "w");
                 $ch = curl_init($each['source']);
                 curl_setopt($ch, CURLOPT_NOPROGRESS, false);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -472,7 +511,18 @@ $app->group('/album', function () use ($app, $model, $fb) {
         $archive = $zippy
             ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
         unset($folders[0]);
-        if (is_array($folders) && parseFloat(count($folders)>0)) {
+        if (is_array($folders) && (count($folders)>0)) {
+            $archive->addMembers($folders, true);
+        }
+        
+        if (!file_exists($user_album_dir)) {
+            mkdir($user_album_dir, 0777, true);
+        }
+        $zippy = Zippy::load();
+        $archive = $zippy
+            ->create('user_albums/'.$time.$_SESSION['user_id'].'_'.$album_name.'.zip', $folders[0], $recurssive = true);
+        unset($folders[0]);
+        if (is_array($folders) && (count($folders)>0)) {
             $archive->addMembers($folders, true);
         }
         
@@ -527,20 +577,24 @@ $app->group('/album', function () use ($app, $model, $fb) {
 
         $created_albums = $folders = array();
         foreach ($album_ids as $key => $album_id) {
-            $photos = $fb
-                ->get('/'.$album_id.'?fields=id,picture,photos.limit(50){source,name},name&limit=1')
+            $album = $fb
+                ->get('/'.$album_id.'?fields=id,name')
                 ->getDecodedBody();
-            $photos['name'] = filename_safe($photos['name']);
-            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$photos['name']);
+            $photos = $fb
+                ->get('/'.$album_id.'/photos?fields=id,photos,source,name&limit=1000')
+                ->getGraphEdge()
+                ->asArray();
+            $album['name'] = filename_safe($album['name']);
+            $unique_name = recursive_check_directory_name($user_album_dir, $user_album_dir.'/'.$album['name']);
             $unique_name = explode('/', $unique_name);
-            $photos['name'] = trim(end($unique_name));
+            $album['name'] = trim(end($unique_name));
             
-            if (!file_exists($user_album_dir.'/'.$photos['name'])) {
-                mkdir($user_album_dir.'/'.$photos['name'], 0777, true);
+            if (!file_exists($user_album_dir.'/'.$album['name'])) {
+                mkdir($user_album_dir.'/'.$album['name'], 0777, true);
             }
-            $created_albums[] = $photos['name'];
-            $folders[] = $user_album_dir.'/'.$photos['name'];
-            $picasa_album   = create_album($photos['name']);
+            $created_albums[] = $album['name'];
+            $folders[] = $user_album_dir.'/'.$album['name'];
+            $picasa_album   = create_album($album['name']);
             
             $uri = '';
             foreach ($picasa_album->link as $entry) {
@@ -548,10 +602,10 @@ $app->group('/album', function () use ($app, $model, $fb) {
                     $uri = $entry->attributes()->{'href'}[0];
                 }
             }
-            foreach ($photos['photos']['data'] as $key => $each) {
+            foreach ($photos as $key => $each) {
                 $photos['data'][$key]['picture'] = $each['source'];
                 
-                $fp = fopen($user_album_dir.'/'.$photos['name'].'/picture_'.($key+1).'.jpg', "w");
+                $fp = fopen($user_album_dir.'/'.$album['name'].'/picture_'.($key+1).'.jpg', "w");
                 $ch = curl_init($each['source']);
                 curl_setopt($ch, CURLOPT_NOPROGRESS, false);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -563,7 +617,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
                 fclose($fp);
             }
             /* Upload copied photos to picasa album */
-            $upload_photos = upload_photos_to_picasa($uri, $user_album_dir.'/'.$photos['name']);
+            $upload_photos = upload_photos_to_picasa($uri, $user_album_dir.'/'.$album['name']);
         }
         
         $folders = array_unique($folders);

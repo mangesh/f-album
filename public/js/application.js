@@ -1,3 +1,4 @@
+
 $(function () {
     
     $('#download-mode-group').slideUp();
@@ -83,6 +84,16 @@ $(function () {
     if ($('.load-album').length !== 0) {
         $(document).on('click', '.load-album img', function (e) {
             e.preventDefault();
+            
+            $data = {
+                size: 32,
+                bgColor: "#fff",
+                bgOpacity: 0.6,
+                fontColor: "#000",
+                title: '',
+            };
+
+            $.loader.open($data);
             $.ajax({
                 method: "GET",
                 url: "/album",
@@ -94,7 +105,6 @@ $(function () {
                 var li;
                 $('.carousel-inner').html('');
                 $.each(result, function(p,i){
-                    console.log(i);
                     div = $('<div>');
                     div.addClass('item');
                     img = $('<img>').appendTo(div);
@@ -105,9 +115,19 @@ $(function () {
                 $('.carousel-inner div').eq(0).addClass('active');
                 
                 $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+                var $carousel = $('.carousel').carousel({
+                    interval: 3000
+                }).hide();
+                imagesLoaded( $('.carousel'), function() {
+                    $.loader.close(true);
+                    $('#openModal').modal({show:true});
+                    console.log('All images are loaded');
+                    $('.carousel').show().carousel('cycle');
+                });
+                
                 //$('.carousel').imagesLoaded( function() {
                     //console.log('images loaded');
-                    $('#openModal').modal({show:true});
+                    
                     //$('.carousel').masonry();
                 //});
                 //$('#openModal').modal({show:true});
@@ -189,7 +209,9 @@ $(function () {
                 $('.link-alert').show();
                 $('button.download').attr('disabled', false);
                 $.loader.close(true);
-                
+                $( "html, body" ).animate({
+                    scrollTop: 0
+                }, 800);
             }).fail(function () {
             }).always(function () {
             })
@@ -236,6 +258,9 @@ $(function () {
                     $('li.album').removeClass('active selected');
                     $('.selected-picasa-albums').attr('disabled',true);
                     $('.upload-alert').show();
+                    $( "html, body" ).animate({
+                        scrollTop: 0
+                    }, 800)
                 }
                 $.loader.close(true);
             }).fail(function () {
@@ -246,10 +271,21 @@ $(function () {
 
     $('#openModal').on('shown.bs.modal', function () {
         
-        var $carousel = $('.carousel').carousel({
+        
+        /*var $carousel = $('.carousel').carousel({
             interval: 3000
-        });
-        $carousel.carousel('cycle');
+        }).hide();*/
+        /*imagesLoaded( $('.carousel'), function() {
+            $.loader.close(true);
+            var $carousel = $('.carousel').carousel({
+                interval: 3000
+            });
+            console.log('All images are loaded');
+            $carousel.carousel('cycle');
+        });*/
+        /*$('.carousel').imagesLoaded( function(){
+            
+        });*/
         
     });
 
