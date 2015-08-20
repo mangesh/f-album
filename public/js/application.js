@@ -121,16 +121,8 @@ $(function () {
                 imagesLoaded( $('.carousel'), function() {
                     $.loader.close(true);
                     $('#openModal').modal({show:true});
-                    console.log('All images are loaded');
                     $('.carousel').show().carousel('cycle');
                 });
-                
-                //$('.carousel').imagesLoaded( function() {
-                    //console.log('images loaded');
-                    
-                    //$('.carousel').masonry();
-                //});
-                //$('#openModal').modal({show:true});
                 
             }).fail(function () {
             }).always(function () {
@@ -203,16 +195,39 @@ $(function () {
                 data: array.join('&'),
                 dataType: "json"
             }).done(function (result) {
-                $('li.album').removeClass('active selected');
-                $('.selected-albums').attr('disabled',true);
-                $('.link-alert .link').attr('href',result.download_link);
-                $('.link-alert').show();
-                $('button.download').attr('disabled', false);
-                $.loader.close(true);
-                $( "html, body" ).animate({
-                    scrollTop: 0
-                }, 800);
+                if (result.status == 'error'){
+                    BootstrapDialog.alert({
+                        title: 'Error!',
+                        message: result.msg,
+                        type: BootstrapDialog.TYPE_WARNING,
+                        closable: true,
+                        draggable: true,
+                        callback: function(result) {
+                            $.loader.close(true);
+                        }
+                    })
+                } else {
+                    $('li.album').removeClass('active selected');
+                    $('.selected-albums').attr('disabled',true);
+                    $('.link-alert .link').attr('href',result.download_link);
+                    $('.link-alert').show();
+                    $('button.download').attr('disabled', false);
+                    $.loader.close(true);
+                    $( "html, body" ).animate({
+                        scrollTop: 0
+                    }, 800);
+                }
             }).fail(function () {
+                BootstrapDialog.alert({
+                    title: 'Error!',
+                    message: 'Technical error occured. PleaseTry again after some time.',
+                    type: BootstrapDialog.TYPE_WARNING,
+                    closable: true,
+                    draggable: true,
+                    callback: function(result) {
+                        $.loader.close(true);
+                    }
+                })
             }).always(function () {
             })
         })
@@ -254,6 +269,17 @@ $(function () {
                 if (result.status == 'need_google_login') {
                     $.loader.close(true);
                     authorize();
+                } else if (result.status == 'error'){
+                    BootstrapDialog.alert({
+                        title: 'Error!',
+                        message: result.msg,
+                        type: BootstrapDialog.TYPE_WARNING,
+                        closable: true,
+                        draggable: true,
+                        callback: function(result) {
+                            $.loader.close(true);
+                        }
+                    })
                 } else {
                     $('li.album').removeClass('active selected');
                     $('.selected-picasa-albums').attr('disabled',true);
@@ -264,6 +290,16 @@ $(function () {
                 }
                 $.loader.close(true);
             }).fail(function () {
+                BootstrapDialog.alert({
+                    title: 'Error!',
+                    message: 'Technical error occured. PleaseTry again after some time.',
+                    type: BootstrapDialog.TYPE_WARNING,
+                    closable: true,
+                    draggable: true,
+                    callback: function(result) {
+                        $.loader.close(true);
+                    }
+                })
             }).always(function () {
             })
         })
@@ -316,7 +352,17 @@ function authorize()
     {
         // popup blocked, for example on ios you can't programatically
         // launch a popup from a tab that was a programatically launched popup
-        alert('Please unblock popup window to login with google account');      
+        BootstrapDialog.alert({
+            title: 'Alert!',
+            message: 'Please unblock popup window to login with google account',
+            type: BootstrapDialog.TYPE_WARNING,
+            closable: true,
+            draggable: true,
+            callback: function(result) {
+                
+            }
+        })
+        //alert('Please unblock popup window to login with google account');      
     }
     // else flow is now in the popup
     // we have designed it to trigger our oauthComplete when finished

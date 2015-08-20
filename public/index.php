@@ -152,7 +152,7 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
     if (isset($_GET['code'])) {
         $clientId       = $google_cred['client_id'];
         $clientSecret   = $google_cred['client_secret'];
-        $referer        = current_page_url().'/home';
+        $referer        = $app->request->getUrl().'/home';
 
         $postBody = 'code='.urlencode($_GET['code'])
                   .'&grant_type=authorization_code'
@@ -317,10 +317,6 @@ $app->get('/callback', function () use ($app, $model, $fb) {
 
 $app->get('/home', function () use ($app, $model, $fb) {
     
-    //$app->etag('unique-id');
-    //$app->lastModified(1286139652);
-    
-
     $fb_cred = $app->config('fb');
     $google_cred = $app->config('google');
 
@@ -454,7 +450,31 @@ $app->group('/album', function () use ($app, $model, $fb) {
     
     $app->get('/download', function () use ($app, $model, $fb) {
 
-        $album_ids      = $_GET['id'];
+        $album_ids  = $app->request->get('id');
+        $album_ids  = array_filter($album_ids);
+
+        $status = $msg = '';
+        if (!$app->request->isAjax()) {
+            $status = 'error';
+            $msg    = 'Invalid request';
+        } elseif (!isset($_SESSION['fb_access_token'])) {
+            $status = 'error';
+            $msg    = 'Authorization required';
+        } elseif (is_array($album_ids) && empty($album_ids)) {
+            $status = 'error';
+            $msg    = 'Please select the album first';
+        }
+        if ($status != '' && $msg != '') {
+            $app->contentType('application/json;charset=utf-8');
+            echo json_encode(
+                array(
+                    'status'    => $status,
+                    'msg'       => $msg
+                )
+            );
+            exit();
+        }
+        
         $time           = time();
         $user_album_dir = 'user_albums/'.$_SESSION['user_id'];
 
@@ -535,11 +555,40 @@ $app->group('/album', function () use ($app, $model, $fb) {
         unlink($time.$_SESSION['user_id'].'_'.$album_name.'.zip');
         chdir('..');*/
         $app->contentType('application/json;charset=utf-8');
-        echo json_encode(array('download_link' => $user_album_dir.'/'.$album_name.'.zip'));
+        echo json_encode(
+            array(
+                'status'    => 'success',
+                'download_link' => $user_album_dir.'/'.$album_name.'.zip'
+            )
+        );
         
     });
 
     $app->get('/upload', function () use ($app, $model, $fb) {
+
+        $album_ids  = $app->request->get('id');
+
+        $status = $mgs = '';
+        if (!$app->request->isAjax()) {
+            $status = 'error';
+            $mgs    = 'Invalid request';
+        } elseif (!isset($_SESSION['fb_access_token']) && !isset($_SESSION['g_access_token'])) {
+            $status = 'error';
+            $mgs    = 'Authorization required';
+        } elseif (!is_array($album_ids) && empty($albums_ids)) {
+            $status = 'error';
+            $mgs    = 'Please select the album';
+        }
+        if ($status != '' && $mgs != '') {
+            $app->contentType('application/json;charset=utf-8');
+            echo json_encode(
+                array(
+                    'status'    => $status,
+                    'msg'       => $mgs
+                )
+            );
+            exit();
+        }
 
         $is_user_exists = $model->getUser($_SESSION['user_id']);
     
@@ -552,7 +601,6 @@ $app->group('/album', function () use ($app, $model, $fb) {
             }
         }
 
-        $album_ids      = $_GET['id'];
         $time           = time();
         $user_album_dir = 'user_albums/'.$_SESSION['user_id'];
 
