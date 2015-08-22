@@ -114,14 +114,16 @@ $(function () {
                 })
                 $('.carousel-inner div').eq(0).addClass('active');
                 
-                $('.carousel-inner .item img').css('max-height',$( window ).height()*0.8);
+                $('.carousel-inner .item img').css('max-height',(($( window ).height()*0.8)-60));
+                //$('.carousel').css('height',503);
                 var $carousel = $('.carousel').carousel({
                     interval: 3000
                 }).hide();
                 imagesLoaded( $('.carousel'), function() {
                     $.loader.close(true);
-                    $('#openModal').modal({show:true});
                     $('.carousel').show().carousel('cycle');
+                    $('#openModal').modal({show:true});
+                    
                 });
                 
             }).fail(function () {

@@ -88,9 +88,11 @@
         }
     }).on("shown.bs.modal", ".modal.modal-fullscreen", function(event) {
         if ($(".carousel", this).length) {
-            updateCarouselTopMargin($(".carousel", this).data("bs.carousel").$element);
+            console.log('1nd argument');
+            updateCarouselTopMargin($(".carousel", this).data("bs.carousel").$element, 503);
         }
     }).on("fit.bs.carousel", ".modal.modal-fullscreen .carousel", function(event) {
+        console.log('2nd argument');
         updateCarouselTopMargin($(this).data("bs.carousel").$element, event.height);
     }).on("replaced.bs.local", ".carousel", function(event) {
         $(this).css("margin-top", 0);
