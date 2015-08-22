@@ -1,4 +1,3 @@
-
 $(function () {
     
     $('#download-mode-group').slideUp();
