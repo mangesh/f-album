@@ -134,7 +134,7 @@ $(function () {
 
             BootstrapDialog.confirm({
                 title: 'Are you sure?',
-                message: 'Downloading all the items may take some time!',
+                message: 'This may take some time!',
                 type: BootstrapDialog.TYPE_WARNING,
                 closable: true,
                 draggable: true,
@@ -306,26 +306,6 @@ $(function () {
         })
     }
 
-    $('#openModal').on('shown.bs.modal', function () {
-        
-        
-        /*var $carousel = $('.carousel').carousel({
-            interval: 3000
-        }).hide();*/
-        /*imagesLoaded( $('.carousel'), function() {
-            $.loader.close(true);
-            var $carousel = $('.carousel').carousel({
-                interval: 3000
-            });
-            console.log('All images are loaded');
-            $carousel.carousel('cycle');
-        });*/
-        /*$('.carousel').imagesLoaded( function(){
-            
-        });*/
-        
-    });
-
     var gutter = parseInt(jQuery('.album').css('marginBottom'));
     if($('#albums').length > 0){
         var $grid = $('#albums').masonry({
@@ -333,16 +313,12 @@ $(function () {
             gutter: gutter,
             itemSelector: '.album',
             columnWidth: '.album',
-            //isAnimated: !Modernizr.csstransitions,
             isFitWidth: true
         });
-        // layout Isotope after each image loads
         $grid.imagesLoaded().progress( function() {
             $grid.masonry();
         });
     }
-    
-    
 })
 
 
@@ -351,8 +327,6 @@ function authorize()
     var oauthWindow = window.open("https://accounts.google.com/o/oauth2/auth?scope=https://picasaweb.google.com/data/&response_type=code&access_type=offline&redirect_uri=http://"+window.location.hostname+"/google_callback&approval_prompt=force&client_id=548862589391-v5so882uie6k657ehpptta1p665uvscu.apps.googleusercontent.com","_blank","width=700,height=400");
     if(!oauthWindow || oauthWindow.closed || typeof oauthWindow.closed=='undefined')
     {
-        // popup blocked, for example on ios you can't programatically
-        // launch a popup from a tab that was a programatically launched popup
         BootstrapDialog.alert({
             title: 'Alert!',
             message: 'Please unblock popup window to login with google account',
@@ -363,11 +337,7 @@ function authorize()
                 
             }
         })
-        //alert('Please unblock popup window to login with google account');      
     }
-    // else flow is now in the popup
-    // we have designed it to trigger our oauthComplete when finished
-    // we will remain idle until then
 }
 
 function oauth_complete()
