@@ -14,7 +14,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'production'
+    'mode' => 'development'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
@@ -188,13 +188,13 @@ $app->get('/google_callback', function () use ($app, $model, $fb) {
             $_SESSION['refresh_token']      = $response["refresh_token"];
             $_SESSION['expires_in']         = time()+$response["expires_in"];
 
-            $model->updateToken(
+            /*$model->updateToken(
                 $_SESSION['user_id'],
                 $response["access_token"],
                 $response["refresh_token"],
                 $response["token_type"],
                 $_SESSION['expires_in']
-            );
+            );*/
         }
         $app->render('g_callback.twig');
     } else {
@@ -285,7 +285,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
             );
         } else {
             //print_r($is_user_exists); echo time(); die();
-            $is_user_exists = (array)$is_user_exists;
+            /*$is_user_exists = (array)$is_user_exists;
             if (isset($is_user_exists['g_access_token']) && $is_user_exists['g_access_token'] <> '') {
                 if ($is_user_exists['expires_in'] < time()) {
                     $refresh = update_token($google_cred, $is_user_exists['refresh_token']);
@@ -308,7 +308,7 @@ $app->get('/callback', function () use ($app, $model, $fb) {
                     $_SESSION['refresh_token']      = $is_user_exists['refresh_token'];
                     $_SESSION['expires_in']         = $is_user_exists["expires_in"];
                 }
-            }
+            }*/
         }
         $app->redirect('/home');
     }
@@ -347,7 +347,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
     /* User profile picture */
     $img= "https://graph.facebook.com/".$_SESSION['user_id']."/picture";
 
-    $is_user_exists = $model->getUser($_SESSION['user_id']);
+    /*$is_user_exists = $model->getUser($_SESSION['user_id']);
     
     if ($is_user_exists) {
         $is_user_exists = (array)$is_user_exists;
@@ -370,7 +370,7 @@ $app->get('/home', function () use ($app, $model, $fb) {
                 }
             }
         }
-    }
+    }*/
 
     /* Fetch user's albums (50 max)*/
 
@@ -572,8 +572,8 @@ $app->group('/album', function () use ($app, $model, $fb) {
         if (!$app->request->isAjax()) {
             $status = 'error';
             $mgs    = 'Invalid request';
-        } elseif (!isset($_SESSION['fb_access_token']) && !isset($_SESSION['g_access_token'])) {
-            $status = 'error';
+        } elseif (!isset($_SESSION['fb_access_token']) || !isset($_SESSION['g_access_token'])) {
+            $status = 'need_google_login';
             $mgs    = 'Authorization required';
         } elseif (!is_array($album_ids) && empty($albums_ids)) {
             $status = 'error';
@@ -590,7 +590,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
             exit();
         }
 
-        $is_user_exists = $model->getUser($_SESSION['user_id']);
+        /*$is_user_exists = $model->getUser($_SESSION['user_id']);
     
         if ($is_user_exists) {
             $is_user_exists = (array) $is_user_exists;
@@ -599,7 +599,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
                 echo json_encode(array('status' => 'need_google_login'));
                 exit();
             }
-        }
+        }*/
 
         $time           = time();
         $user_album_dir = 'user_albums/'.$_SESSION['user_id'];

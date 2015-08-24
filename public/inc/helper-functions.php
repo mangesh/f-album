@@ -62,7 +62,6 @@
                         <title type='text'>".$album_name."</title>
                         <summary type='text'>Facebook album uploaded via f-album app</summary>
                         <gphoto:access>private</gphoto:access>
-                        <gphoto:timestamp>".time()."</gphoto:timestamp>
                         <category scheme='http://schemas.google.com/g/2005#kind'
                         term='http://schemas.google.com/photos/2007#album'></category>
                     </entry>";
