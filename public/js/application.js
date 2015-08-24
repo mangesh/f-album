@@ -114,7 +114,6 @@ $(function () {
                 $('.carousel-inner div').eq(0).addClass('active');
                 
                 $('.carousel-inner .item img').css('max-height',(($( window ).height()*0.8)-60));
-                //$('.carousel').css('height',503);
                 var $carousel = $('.carousel').carousel({
                     interval: 3000
                 }).hide();
@@ -122,7 +121,6 @@ $(function () {
                     $.loader.close(true);
                     $('.carousel').show().carousel('cycle');
                     $('#openModal').modal({show:true});
-                    
                 });
                 
             }).fail(function () {
@@ -319,6 +317,13 @@ $(function () {
             $grid.masonry();
         });
     }
+
+    $(document).on("shown.bs.modal", ".modal", function(event) {
+        if ($(".carousel").length) {
+            console.log('hi');
+            $(".carousel").data("bs.carousel").fit();
+        }
+    })
 })
 
 
@@ -342,6 +347,5 @@ function authorize()
 
 function oauth_complete()
 {
-    console.log('auth complete');
     $('.selected-picasa-albums').attr('disabled',false).trigger('click');
 }

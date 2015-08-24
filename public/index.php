@@ -567,8 +567,9 @@ $app->group('/album', function () use ($app, $model, $fb) {
     $app->get('/upload', function () use ($app, $model, $fb) {
 
         $album_ids  = $app->request->get('id');
+        $album_ids  = array_filter($album_ids);
 
-        $status = $mgs = '';
+        $status = $msg = '';
         if (!$app->request->isAjax()) {
             $status = 'error';
             $mgs    = 'Invalid request';
@@ -577,14 +578,14 @@ $app->group('/album', function () use ($app, $model, $fb) {
             $mgs    = 'Authorization required';
         } elseif (!is_array($album_ids) && empty($albums_ids)) {
             $status = 'error';
-            $mgs    = 'Please select the album';
+            $msg    = 'Please select the album first';
         }
-        if ($status != '' && $mgs != '') {
+        if ($status != '' && $msg != '') {
             $app->contentType('application/json;charset=utf-8');
             echo json_encode(
                 array(
                     'status'    => $status,
-                    'msg'       => $mgs
+                    'msg'       => $msg
                 )
             );
             exit();
