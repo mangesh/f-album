@@ -575,7 +575,7 @@ $app->group('/album', function () use ($app, $model, $fb) {
             $mgs    = 'Invalid request';
         } elseif (!isset($_SESSION['fb_access_token']) || !isset($_SESSION['g_access_token'])) {
             $status = 'need_google_login';
-            $mgs    = 'Authorization required';
+            $msg    = 'Authorization required';
         } elseif (!is_array($album_ids) && empty($albums_ids)) {
             $status = 'error';
             $msg    = 'Please select the album first';
