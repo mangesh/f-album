@@ -320,7 +320,6 @@ $(function () {
 
     $(document).on("shown.bs.modal", ".modal", function(event) {
         if ($(".carousel").length) {
-            console.log('hi');
             $(".carousel").data("bs.carousel").fit();
         }
     })
