@@ -323,6 +323,7 @@ $(function () {
             $(".carousel").data("bs.carousel").fit();
         }
     })
+   
 })
 
 

@@ -7,13 +7,16 @@
                 <input type="radio" id="option1"> Mode:
             </label>
             <label class="btn btn-info active">
-                <input type="radio" name="mode" value="view" id="option2"> View
+                <input type="radio" name="mode" value="view" id="option2">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span> View
             </label>
             <label class="btn btn-info">
-                <input type="radio" name="mode" value="download" id="option3"> Download
+                <input type="radio" name="mode" value="download" id="option3"> 
+                <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download
             </label>
             <label class="btn btn-info">
-                <input type="radio" name="mode" value="upload" id="option4"> Upload to G+
+                <input type="radio" name="mode" value="upload" id="option4"> 
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload to G+
             </label>
         </div>
         <div class="clear"></div>
@@ -45,7 +48,7 @@
                             <button type="button" class="btn btn-primary btn-xs download">Download</button>
                         </p>
                         <p class="name">
-                            {{album.name}}
+                            {{album.name}} <span class="badge">{{album.count}}</span>
                         </p>
                     </div>
                     
