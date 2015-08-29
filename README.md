@@ -30,7 +30,7 @@ This app requires PHP 5.3 or greater.
 
 Clone the repo: `git clone https://github.com/mangesh/f-album.git`.
 
-then install it through composer:
+then install it through [Composer](http://getcomposer.org):
 
 ```shell
 php composer.phar install --no-dev
