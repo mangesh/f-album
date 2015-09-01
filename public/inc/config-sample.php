@@ -9,7 +9,7 @@
     $fb = array(
             'app_id'        => '',
             'app_secret'    => '',
-            'callback_url'  => ''   //http://<your-domain>/callback
+            'callback_url'  => ''   //'http://<your-domain>/callback'
         );
 
     $google = array(
