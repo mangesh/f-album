@@ -15,7 +15,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'development'
+    'mode' => 'production'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
