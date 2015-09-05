@@ -7,6 +7,7 @@ ini_set("display_errors", 1);
 set_time_limit(0);
 session_start();
 date_default_timezone_set('Asia/Calcutta');
+
 // Load Composer's PSR-4 autoloader (necessary to load Slim, Mini etc.)
 require '../lib/vendor/autoload.php';
 
@@ -14,7 +15,7 @@ use Alchemy\Zippy\Zippy;
 
 // Initialize Slim (the router/micro framework used)
 $app = new \Slim\Slim(array(
-    'mode' => 'production'
+    'mode' => 'development'
 ));
 
 // and define the engine used for the view @see http://twig.sensiolabs.org
